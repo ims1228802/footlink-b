@@ -8,6 +8,7 @@ public class FootlinkApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FootlinkApplication.class, args);
+		
 	}
 
 }
