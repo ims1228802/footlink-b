@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.footlink.footlink.user.login.mapper.LoginMapper">
+  	<resultMap type="com.footlink.footlink.user.login.DTO.LoginRequest" id="userResultMap">
+		<id column="user_id" 						property="id" />
+		<result column="user_email" 				property="email" />
+		<result column="user_pw" 					property="password" />
+	</resultMap>
+  
+  	<!-- 특정회원 조회 -->
+	<select id="getUserInfoByEmail"  resultMap="userResultMap"> 
+	SELECT user_id, user_email, user_pw
+	FROM `user`
+	WHERE user_email = #{email} 
+	</select>
+  </mapper>
