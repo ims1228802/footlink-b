@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 public class LoginResponse {
     private String token;
     private String name;
-    // getter, setter, constructor
 }
