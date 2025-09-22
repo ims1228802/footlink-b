@@ -1,4 +1,4 @@
-package com.footlink.footlink.user.login.DTO;
+package com.footlink.footlink.user.login.domain;
 
 import lombok.Getter;
 import lombok.Setter;

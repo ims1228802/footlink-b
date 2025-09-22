@@ -27,7 +27,7 @@ public class JwtTokenProvider {
                 .claim("role", role)                // 커스텀 클레임 (권한 등)
                 .setIssuedAt(now)                   // 발급 시간
                 .setExpiration(expiryDate)          // 만료 시간
-                .signWith(secretKey) // ✅ 안전한 키로 서명
+                .signWith(secretKey) 				// ✅ 안전한 키로 서명
                 .compact();
     }
 }
