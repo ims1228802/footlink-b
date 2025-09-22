@@ -1,7 +1,8 @@
 package com.footlink.footlink.user.login.mapper;
 
-import com.footlink.footlink.user.login.DTO.LoginRequest;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.footlink.footlink.user.login.domain.LoginRequest;
 
 
  @Mapper
@@ -9,4 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
 	
 	//회원조회
 	LoginRequest getUserInfoByEmail(String email);
+	
 }

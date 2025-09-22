@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.footlink.footlink.user.login.DTO.LoginRequest;
-import com.footlink.footlink.user.login.DTO.LoginResponse;
 import com.footlink.footlink.user.login.JwtToken.JwtTokenProvider;
+import com.footlink.footlink.user.login.domain.LoginRequest;
+import com.footlink.footlink.user.login.domain.LoginResponse;
 import com.footlink.footlink.user.login.service.LoginService;
 
 import lombok.RequiredArgsConstructor;
