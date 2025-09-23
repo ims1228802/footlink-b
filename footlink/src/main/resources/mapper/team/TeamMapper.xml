@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mapper DTD 선언 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- SQL Mapping -->
+<mapper namespace="com.footlink.footlink.team.mapper.TeamMapper">
+	<resultMap type="com.footlink.footlink.team.domain.Team" id="TeamList">
+		<id column="team_cd"	property="teamCode"/>
+		<result column="team_nm"	property="teamName"/>
+		<result column="rgn_nm"		property="regionName"/>
+		<result column="mtn_tm"	property="meetingTime"/>
+		<result column="team_age"	property="teamAge"/>
+		<result column="level_cd"	property="levelCode"/>
+		<result column="is_temp"	property="isTemp"/>
+	</resultMap>
+	
+	<select id="getTeamList" resultMap="TeamList">
+		SELECT
+			t.team_cd,
+			t.team_nm,
+			t.rgn_nm,
+			t.mtn_tm,
+			t.team_age,
+			t.level_cd,
+			t.is_temp
+		FROM
+			team t;
+	</select>
+</mapper>

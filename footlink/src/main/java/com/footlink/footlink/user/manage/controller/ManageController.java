@@ -27,6 +27,7 @@ public class ManageController {
 		 
 		 boolean exists = manageService.checkPhoneDuplicate(phone);
 		 log.info("phone: {}", phone);
+		 log.info("exists: {}", exists);
 
 		 return Map.of("exists", exists);
 }
