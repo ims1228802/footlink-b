@@ -14,11 +14,7 @@ public class ManageServiceImpl implements ManageService {
 
 	@Override
 	public boolean checkPhoneDuplicate(String phone) {
-		// TODO Auto-generated method stub
 		return memberMapper.existsByPhone(phone);
 	}
-	
-
-	
 	
 }

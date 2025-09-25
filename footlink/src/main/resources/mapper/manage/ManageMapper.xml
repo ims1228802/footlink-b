@@ -17,8 +17,8 @@
     <!-- 휴대폰 번호 중복 여부 확인 -->
     <select id="existsByPhone" parameterType="string" resultType="boolean">
         SELECT EXISTS (
-            SELECT 1
-            FROM user
+            SELECT *
+            FROM `user`
             WHERE user_phn_num = #{phone}
             )
     </select>
