@@ -49,6 +49,7 @@ public class ManageController {
         boolean result = manageService.verifyCode(request.getPhone(), request.getCode());
         return result ? ResponseEntity.ok("인증 성공")
                       : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+        
     }
     
     @PostMapping("/signup")
