@@ -51,7 +51,6 @@ public class ManageController {
                       : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
     }
     
-
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest request) {
         manageService.signUp(request);

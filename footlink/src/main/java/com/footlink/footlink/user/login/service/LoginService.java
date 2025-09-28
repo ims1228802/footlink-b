@@ -8,6 +8,7 @@ public interface LoginService {
 	// 회원 아이디,비밀번호 조회
 	Map<String, Object> matchedUser(String email, String password);
 	
+	
 
 	
 }

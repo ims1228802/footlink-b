@@ -42,7 +42,7 @@ public class LoginController {
         
         if (resultMap == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(new LoginResponse(null, "LoginService returned null"));
+                                 .body(new LoginResponse(null,null, "LoginService returned null"));
         }
         
         boolean isMatched = (boolean) resultMap.get("isMatched");
@@ -53,7 +53,7 @@ public class LoginController {
         String token = jwtTokenProvider.createToken(userInfo.getEmail(), "ROLE_USER");
         // ✅ 로그인 성공 → JWT 생성
         log.info("token={}", token);
-        return ResponseEntity.ok(new LoginResponse(token, userInfo.getEmail()));
+        return ResponseEntity.ok(new LoginResponse(token, null, userInfo.getEmail()));
     } else {
     	// ✅ 로그인 실패 → 401 Unauthorized
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

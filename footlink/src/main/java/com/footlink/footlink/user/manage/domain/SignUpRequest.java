@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+//사용자가 입력한 폼데이터를 받는용도
+
 @Getter
 @Setter
 @Data
