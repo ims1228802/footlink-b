@@ -9,4 +9,5 @@ import com.footlink.footlink.team.domain.Team;
 @Mapper
 public interface TeamMapper {
 	List<Team> getTeamList();
+	List<Team> getSearchTeamList(String inputParam);
 }
