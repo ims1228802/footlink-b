@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api")
 public class ManageController {
 
@@ -55,6 +55,7 @@ public class ManageController {
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest request) {
         manageService.signUp(request);
+        log.info("회원가입 요청 gender = {}", request.getGender());
         return ResponseEntity.ok("회원가입 성공");
     }
     

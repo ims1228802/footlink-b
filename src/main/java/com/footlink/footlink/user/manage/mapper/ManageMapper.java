@@ -20,4 +20,6 @@ public interface ManageMapper {
 
 	void signUp(User user);
 	
+	String findLastUserIdForUpdate();
+	
 }

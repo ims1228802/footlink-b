@@ -63,11 +63,20 @@
 		LIMIT 1
 	</select>
 
+	<select id="findLastUserIdForUpdate" resultType="string">
+		SELECT user_id
+		FROM `user`
+		ORDER BY user_id DESC
+		LIMIT 1
+		FOR UPDATE
+	</select>
+
 	<!-- 유저 회원가입 -->
 	<insert id="signUp"
 		parameterType="com.footlink.footlink.user.manage.domain.User">
 		INSERT INTO `user`
-		(user_id, user_email, user_pw, user_phn_num, user_birth, user_gender,
+		(user_id, user_email, user_pw,
+		user_phn_num, user_birth, user_gender,
 		user_addr, user_nm)
 		VALUES
 		(#{id}, #{email}, #{password}, #{phone}, #{birth}, #{gender}, #{addr},
