@@ -2,13 +2,10 @@ package com.footlink.footlink.user.login.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.footlink.footlink.user.login.domain.LoginRequest;
+import com.footlink.footlink.user.manage.domain.User;
 
+@Mapper
+public interface LoginMapper {
 
- @Mapper
- public interface LoginMapper {
-	
-	//회원조회
-	LoginRequest getUserInfoByEmail(String email);
-	
+    User getUserInfoByEmail(String email);
 }
