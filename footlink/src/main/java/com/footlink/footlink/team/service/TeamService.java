@@ -6,4 +6,5 @@ import com.footlink.footlink.team.domain.Team;
 
 public interface TeamService {
 	List<Team> getTeamList();
+	List<Team> getSearchTeamList(String param);
 }

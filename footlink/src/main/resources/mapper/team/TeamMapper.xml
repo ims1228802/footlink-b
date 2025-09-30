@@ -10,10 +10,12 @@
 		<id column="team_cd"	property="teamCode"/>
 		<result column="team_nm"	property="teamName"/>
 		<result column="rgn_nm"		property="regionName"/>
-		<result column="mtn_tm"	property="meetingTime"/>
-		<result column="team_age"	property="teamAge"/>
+		<result column="mtn_tm"	property="meetingTimeCode"/>
+		<result column="team_age"	property="teamAgeCode"/>
 		<result column="level_cd"	property="levelCode"/>
 		<result column="is_temp"	property="isTemp"/>
+		<result column="view_cnt"	property="viewCount"/>
+		<result column="favorite_cnt"	property="favoriteCount"/>
 	</resultMap>
 	
 	<select id="getTeamList" resultMap="TeamList">
@@ -21,11 +23,49 @@
 			t.team_cd,
 			t.team_nm,
 			t.rgn_nm,
-			t.mtn_tm,
-			t.team_age,
-			t.level_cd,
-			t.is_temp
+			m.mtn_tm_nm AS meetingTime,
+			ta.team_age_name AS teamAge,
+			l.tier AS level,
+			t.is_temp,
+			t.view_cnt,
+			t.favorite_cnt,
+			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
+			s.stadium_nm AS stadium
 		FROM
-			team t;
+			team t
+		LEFT JOIN meeting_times m
+		ON t.mtn_tm = m.mtn_tm_cd
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		LEFT JOIN stadium s
+		ON t.stadium = s.stadium_no;
+	</select>
+	
+	<select id="getSearchTeamList" resultMap="TeamList" parameterType="String">
+		SELECT
+			t.team_cd,
+			t.team_nm,
+			t.rgn_nm,
+			m.mtn_tm_nm AS meetingTime,
+			ta.team_age_name AS teamAge,
+			l.tier AS level,
+			t.is_temp,
+			t.view_cnt,
+			t.favorite_cnt,
+			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
+			s.stadium_nm AS stadium
+		FROM
+			team t
+		LEFT JOIN meeting_times m
+		ON t.mtn_tm = m.mtn_tm_cd
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		LEFT JOIN stadium s
+		ON t.stadium = s.stadium_no
+		WHERE t.team_nm like '%${inputParam}%';
 	</select>
 </mapper>
