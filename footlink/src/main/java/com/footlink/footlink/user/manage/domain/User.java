@@ -15,5 +15,8 @@ public class User {
 	private String birth;
     private String gender;
 	private String addr;
-	
+
+//    private String role;          // 권한 (ex: ROLE_USER / ROLE_ADMIN)
+//    private Long profileFileId;   // 파일 테이블(Files) FK — 프로필 이미지
+    
 }

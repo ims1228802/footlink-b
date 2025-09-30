@@ -10,7 +10,6 @@ public class AppConfig {
 	@Bean
 	public RestTemplate restTemplate() {	
 		
-		System.out.println("error");
 		return new RestTemplate();
 	}
 }
