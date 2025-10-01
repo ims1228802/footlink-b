@@ -53,10 +53,10 @@ public class MatchServiceImpl implements MatchService{
 		return matchMapper.findByKeyword(keyword);
 	}
 
-	@Override	
-	public List<Match> findAll() {
+	@Override
+	public List<Match> findAllMatch() {
 		
-		return matchMapper.findAll();
+		return matchMapper.findAllMatch();
 	}
 
 	@Override
@@ -102,8 +102,17 @@ public class MatchServiceImpl implements MatchService{
 		case 12		-> maxLevelCode  = "level_12";
 	}
 		addMatch.setMaxLevelCode(maxLevelCode);
-		int result = matchMapper.addMatch(addMatch);
 
+		String matchTypeCode = "";
+		switch (addMatch.getMatchType()) {
+		case "6vs6" -> matchTypeCode = "match_type_01";
+		case "5vs5" -> matchTypeCode = "match_type_02";
+		case "4vs4" -> matchTypeCode = "match_type_03";
+	}
+		addMatch.setMatchType(matchTypeCode);
+		
+		int result = matchMapper.addMatch(addMatch);
+		
 	    // INSERT가 성공했는지 확인
 	    if (result == 1) {
 	        // 성공했다면, 컨트롤러에게 전달할 addMatch 객체를 그대로 반환

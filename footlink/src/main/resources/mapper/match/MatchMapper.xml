@@ -11,10 +11,11 @@
 			<result column="match_end_time" property="matchEndTime"/>
 			<result column="rcrtm_nope"		property="rcrtmNope"/>
 			<result column="atnd_nope"		property="atndNope"/>
-			<result column="level_cd" 	property="matchLevel" />
+			<result column="min_level_cd" 	property="minLevel" />
+			<result column="max_level_cd" 	property="maxLevel" />
 			<result column="match_stts" 	property="matchStts" />
 			<result column="gender_nm" 	property="genderName" />
-			<result column="match_type_nm"  property="matchMethod" />
+			<result column="match_type_cd"  property="matchMethod" />
 	</resultMap>
 	<resultMap type="com.footlink.footlink.user.match.domain.Stadium" id="staListMap">
 			<id column="stadium_no" 				property="staNo"/>
@@ -54,20 +55,16 @@
 			genders;
 	</select>
 	<select id="findAllMatch" resultMap="MatchResultMap">
-		SELECT 
-			match_no, 
-			field_no, 
-			match_date, 
-			match_time, 
-			match_end_time, 
-			rcrtm_nope, 
-			atnd_nope, 
-			level_cd, 
-			match_stts_no, 
-			gender_cd, 
-			match_type_cd
-		FROM 
-			matches
+		SELECT
+			*
+		FROM
+			matches m INNER JOIN match_types mt
+			ON m.match_type_cd = mt.match_type_cd
+			INNER JOIN levels l ON m.min_level_cd =
+			l.level_cd
+		WHERE
+			m.match_stts_no = 1;
+
 	</select>
 	<select id="stadiumList" resultMap="staListMap">
 		SELECT 
@@ -132,7 +129,7 @@
 			min_level_cd, 
 			max_level_cd, 
 			match_stts_no, 
-			gender_cd, 
+			gender_nm, 
 			match_type_cd)
 		VALUES 
 			(#{fieldNo}, 

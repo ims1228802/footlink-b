@@ -89,15 +89,14 @@ public class MatchApiController {
 	@GetMapping("/Match")
 	public ResponseEntity<Map<String, Object>> getMatchList(){
 		
-//		List<Match> matchList = matchService.findAll();
-		List<Gender> testList = matchService.test();
+		List<Match> matchList = matchService.findAllMatch();
 		List<Stadium> staList = matchService.stadiumList();
 		List<Province> proList = matchService.findProvince();
 		
 		Map<String, Object> response = new HashMap<>();
 //		response.put("matchList", matchList);
 		
-		response.put("test", testList);
+		response.put("matchList", matchList);
 		response.put("Sta", staList);
 		response.put("pro", proList);
 		

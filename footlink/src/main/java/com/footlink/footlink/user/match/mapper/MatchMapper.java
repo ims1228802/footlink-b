@@ -13,7 +13,7 @@ import com.footlink.footlink.user.match.domain.Stadium;
 
 @Mapper
 public interface MatchMapper {
-	List<Match> findAll();
+	List<Match> findAllMatch();
 	List<Gender> test();
 	List<Stadium> stadiumList();
 	List<Stadium> findByKeyword(String keyword);

@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Match {
 	
-
 	private String matchNo;
 	private String fieldNo;
 	private String fieldName;

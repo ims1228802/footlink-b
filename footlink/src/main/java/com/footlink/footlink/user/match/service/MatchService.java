@@ -10,7 +10,7 @@ import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 
 public interface MatchService {
-	List<Match> findAll();
+	List<Match> findAllMatch();
 	List<Gender> test();
 	List<Stadium> stadiumList();
 	List<Stadium> selectKeyword(String keyword);
