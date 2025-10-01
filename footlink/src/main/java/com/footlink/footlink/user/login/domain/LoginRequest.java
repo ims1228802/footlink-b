@@ -8,7 +8,7 @@ import lombok.Setter;
 
 public class LoginRequest  {
 	
-    private String id;
     private String email;
     private String password;
+    private String role; //관리자/일반유저 구분용
 }
