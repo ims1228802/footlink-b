@@ -9,7 +9,6 @@ public class PasswordEncoderConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
     	
-    	System.out.println("error");
         return new BCryptPasswordEncoder();
     }
 }

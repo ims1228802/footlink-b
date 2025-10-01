@@ -77,7 +77,7 @@ public class ManageServiceImpl implements ManageService {
 
 			ResponseEntity<String> resp = restTemplate
 					.postForEntity("https://api.solapi.com/messages/v4/send-many/detail", entity, String.class);
-
+				
 			System.out.println("Solapi Response: " + resp.getBody());
 
 		} catch (Exception e) {
@@ -115,7 +115,6 @@ public class ManageServiceImpl implements ManageService {
 		default -> request.getGender();
 		};
 		
-
 		// 트랜잭션 범위 안에서 FOR UPDATE 쿼리 실행
 		String lastId = manageMapper.findLastUserIdForUpdate();
 
