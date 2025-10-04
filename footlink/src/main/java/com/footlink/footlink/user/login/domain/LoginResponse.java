@@ -1,5 +1,7 @@
 package com.footlink.footlink.user.login.domain;
 
+// 로그인 성공/실패 응답 DTO
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

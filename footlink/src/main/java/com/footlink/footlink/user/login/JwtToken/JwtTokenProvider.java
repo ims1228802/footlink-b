@@ -25,11 +25,14 @@ public class JwtTokenProvider {
 	// @param username 사용자 아이디
 	// @return JWT 문자열
 
-	public String createToken(String userEmail, String role) {
+	public String createToken(String email, String role) {
+		
+		Claims claims = Jwts.claims().setSubject(email); // 이메일을 subject로
+		
 		Date now = new Date();
 		Date expiryDate = new Date(now.getTime() + accessTokenValidity);
 
-		return Jwts.builder().setSubject(userEmail) // 토큰 제목 (사용자 식별값)
+		return Jwts.builder().setSubject(email) // 토큰 제목 (사용자 식별값)
 				.claim("role", role) // 커스텀 클레임 (권한 등)
 				.setIssuedAt(now) // 발급 시간
 				.setExpiration(expiryDate) // 만료 시간

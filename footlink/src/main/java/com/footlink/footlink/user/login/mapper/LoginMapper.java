@@ -8,4 +8,5 @@ import com.footlink.footlink.user.manage.domain.User;
 public interface LoginMapper {
 
     User getUserInfoByEmail(String email);
+    
 }

@@ -1,5 +1,7 @@
 package com.footlink.footlink.user.login.domain;
 
+// 로그인 요청 DTO
+
 import lombok.Getter;
 import lombok.Setter;
 
