@@ -1,5 +1,7 @@
 package com.footlink.footlink.user.login.domain;
 
+// 로그인 요청 DTO
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +10,7 @@ import lombok.Setter;
 
 public class LoginRequest  {
 	
-    private String id;
     private String email;
     private String password;
+    private String role; //관리자/일반유저 구분용
 }

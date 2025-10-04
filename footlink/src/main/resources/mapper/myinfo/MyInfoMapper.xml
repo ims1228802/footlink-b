@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.footlink.footlink.user.myinfo.mapper.MyInfoMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="MyInfoMap" type="com.footlink.footlink.user.myinfo.domain.MyInfo">
+        <id property="id" column="user_id" />
+        <result property="role" column="authrt_cd" />
+        <result property="email" column="user_email" />
+        <result property="phone" column="user_phn_num" />
+        <result property="birth" column="user_birth" />
+        <result property="gender" column="user_gender" />
+        <result property="addr" column="user_addr" />
+        <result property="joinYmd" column="join_ymd" />
+        <result property="name" column="user_nm" />
+        <result property="profile" column="user_img" />
+        <result property="pstAbly" column="user_pst_ably" />
+        <result property="pst" column="user_pst" />
+        <result property="level" column="user_level" />
+        <result property="intro" column="user_intro" />
+    </resultMap>
+
+    <!-- ✅ 이메일 기준으로 내 정보 조회 -->
+    <select id="getMyInfoByEmail" resultMap="MyInfoMap">
+        SELECT
+            user_id,
+            authrt_cd,
+            user_email,
+            user_phn_num,
+            user_birth,
+            user_gender,
+            user_addr,
+            join_ymd,
+            user_nm,
+            user_img,
+            user_pst_ably,
+            user_pst,
+            user_level,
+            user_intro
+        FROM user
+        WHERE user_email = #{email}
+    </select>
+
+</mapper>
