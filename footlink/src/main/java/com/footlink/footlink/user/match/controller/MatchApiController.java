@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.footlink.footlink.user.match.domain.AddMatch;
 import com.footlink.footlink.user.match.domain.Field;
-import com.footlink.footlink.user.match.domain.Gender;
 import com.footlink.footlink.user.match.domain.Match;
+import com.footlink.footlink.user.match.domain.MatchDetail;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.SelectSta;
 import com.footlink.footlink.user.match.domain.Stadium;
@@ -46,8 +46,17 @@ public class MatchApiController {
 		
 		return results;
 	}
-	
-	 @GetMapping("/{staNo}/fields")
+	@GetMapping("Match/{matchNo}")
+	public ResponseEntity<MatchDetail> getMatchInfo(@PathVariable("matchNo") String matchNo) {
+		List<MatchDetail> matchInfoList = matchService.getMatchInfo(matchNo);
+		
+		 MatchDetail matchInfo = matchInfoList.get(0);
+		 
+		 log.info("리액트로 반환한 데이터" + matchInfo);
+		
+		return ResponseEntity.ok(matchInfo);
+	}
+	@GetMapping("/{staNo}/fields")
 	 public List<Field> getStadiumFields(@PathVariable("staNo") String staNo) {
 		 
 		 List<Field> field = matchService.getfieldList(staNo);
