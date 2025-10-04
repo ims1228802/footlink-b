@@ -9,6 +9,7 @@ import com.footlink.footlink.user.match.domain.AddMatch;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Gender;
 import com.footlink.footlink.user.match.domain.Match;
+import com.footlink.footlink.user.match.domain.MatchDetail;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 import com.footlink.footlink.user.match.mapper.MatchMapper;
@@ -46,7 +47,11 @@ public class MatchServiceImpl implements MatchService{
 
 		return matchMapper.findProvince();
 	}
-	
+	@Override
+	public List<MatchDetail> getMatchInfo(String matchNo) {
+		
+		return matchMapper.getMatchInfo(matchNo);
+	}
 	@Override
 	public List<Stadium> selectKeyword(String keyword) {
 		

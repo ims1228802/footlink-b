@@ -6,6 +6,7 @@ import com.footlink.footlink.user.match.domain.AddMatch;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Gender;
 import com.footlink.footlink.user.match.domain.Match;
+import com.footlink.footlink.user.match.domain.MatchDetail;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 
@@ -18,4 +19,5 @@ public interface MatchService {
 	List<Field> getfieldList(String staNo);
 	List<Match> getBookList(String fieldNo, String date);
 	AddMatch addmatch(AddMatch addMatch);
+	List<MatchDetail> getMatchInfo(String matchNo);
 }

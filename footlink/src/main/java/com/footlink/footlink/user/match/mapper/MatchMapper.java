@@ -8,6 +8,7 @@ import com.footlink.footlink.user.match.domain.AddMatch;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Gender;
 import com.footlink.footlink.user.match.domain.Match;
+import com.footlink.footlink.user.match.domain.MatchDetail;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 
@@ -21,4 +22,5 @@ public interface MatchMapper {
 	List<Field> getfieldList(String staNo);
 	List<Match> getbookList(String fieldNo, String date);
 	int addMatch(AddMatch addMatch);
+	List<MatchDetail> getMatchInfo(String matchNo);
 }

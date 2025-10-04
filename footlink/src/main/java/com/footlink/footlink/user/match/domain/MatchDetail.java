@@ -19,10 +19,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Match {
+public class MatchDetail {
 	
 	private String matchNo;
 	private String fieldName;
+	private String spcffct;
 	private String filePath;
 	private String staName;
 	private String staAddr;
@@ -35,5 +36,12 @@ public class Match {
 	private String matchTypeName;
 	private String region;
 	private int totalPlayers;
+	private String hasShower;
+	private String hasRestroom;
+	private String hasParking;
+	private String shoRtYn;
+	private String hasTshirtRental;
+	private String ballRtYn;
+	private String hasStore;
 	
 }
