@@ -66,7 +66,7 @@
 		ON t.level_cd = l.level_cd
 		LEFT JOIN stadium s
 		ON t.stadium = s.stadium_no
-		WHERE t.team_nm like '%${inputParam}%';
+		WHERE t.team_nm like CONCAT('%', #{inputParam}, '%');
 	</select>
 	
 	<select id="getArea" resultType="com.footlink.footlink.user.team.domain.StadiumArea" >
@@ -87,7 +87,7 @@
 	</select>
 	
 	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
-		INSERT IGNORE INTO team(
+		INSERT INTO team(
 			 team_cd, 
 			 team_nm, 
 			 rgn_nm, 
@@ -104,7 +104,7 @@
 			 #{teamName}, 
 			 #{regionName},
 			  (SELECT mt.mtn_tm_cd FROM meeting_times mt WHERE mt.mtn_tm_nm = #{meetingTime}), 
-			  (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE '%${teamAge}%'), 
+			  (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{teamAge}, '%')), 
 			  (SELECT l.level_cd FROM levels l WHERE l.tier = #{level}), 
 			  #{isTemp}, 
 			  (SELECT s.stadium_no FROM stadium s WHERE s.stadium_nm = #{stadium}), 
@@ -114,7 +114,7 @@
 	</insert>
 	
 	<insert id="addTeamState" parameterType="com.footlink.footlink.user.team.domain.State">
-		INSERT IGNORE INTO team_state(
+		INSERT INTO team_state(
 			 team_cd, 
 			 attack, 
 			 speed, 
