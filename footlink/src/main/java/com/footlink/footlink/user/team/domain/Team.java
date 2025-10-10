@@ -1,4 +1,4 @@
-package com.footlink.footlink.team.domain;
+package com.footlink.footlink.user.team.domain;
 
 import java.sql.Time;
 
@@ -20,4 +20,6 @@ public class Team {
 	private int viewCount;						// 팀 조회수
 	private int favoriteCount;					// 관심 조회수
 	private String stadium;						// 구장
+	private String gender;						// 성별
+	private String activeDoWeek;				// 활동 요일
 }

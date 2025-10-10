@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/Match")
 @CrossOrigin(origins = "http://localhost:5173")
 public class MatchApiController {
 	private final MatchService matchService;
@@ -46,7 +46,7 @@ public class MatchApiController {
 		
 		return results;
 	}
-	@GetMapping("Match/{matchNo}")
+	@GetMapping("/{matchNo}")
 	public ResponseEntity<MatchDetail> getMatchInfo(@PathVariable("matchNo") String matchNo) {
 		List<MatchDetail> matchInfoList = matchService.getMatchInfo(matchNo);
 		
@@ -66,7 +66,7 @@ public class MatchApiController {
 		 return field;
 	 }
 	 
-	@GetMapping("/Match/booked-slots")
+	@GetMapping("/booked-slots")
 	public List<Match> getBookedTimeSlots(
             @RequestParam("fieldNo") String fieldNo,
             @RequestParam("date") String date) {
@@ -95,7 +95,7 @@ public class MatchApiController {
         return ResponseEntity.ok("매치 등록 요청을 성공적으로 받았습니다.");
     } 
 	
-	@GetMapping("/Match")
+	@GetMapping("/matchList")
 	public ResponseEntity<Map<String, Object>> getMatchList(){
 		
 		List<Match> matchList = matchService.findAllMatch();
