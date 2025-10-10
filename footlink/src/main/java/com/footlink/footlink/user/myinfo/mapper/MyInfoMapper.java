@@ -7,5 +7,7 @@ import com.footlink.footlink.user.myinfo.domain.MyInfo;
 public interface MyInfoMapper {
 	
     MyInfo getMyInfoByEmail(String email);
+
+	int modifyMyInfo(MyInfo myInfo);
     
 }
