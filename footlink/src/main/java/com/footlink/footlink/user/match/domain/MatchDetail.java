@@ -36,12 +36,12 @@ public class MatchDetail {
 	private String matchTypeName;
 	private String region;
 	private int totalPlayers;
-	private String hasShower;
-	private String hasRestroom;
-	private String hasParking;
+	private String showerYn;
+	private String restYn;
+	private String parkingYn;
 	private String shoRtYn;
-	private String hasTshirtRental;
+	private String vestRtYn;
 	private String ballRtYn;
-	private String hasStore;
+	private String sellDrink;
 	
 }
