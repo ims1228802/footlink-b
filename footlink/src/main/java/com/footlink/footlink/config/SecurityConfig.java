@@ -38,10 +38,11 @@ public class SecurityConfig {
             // 세션 비활성화
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
+            
 
             // URL별 접근 권한 설정
             .authorizeRequests()
-                .requestMatchers("/api/login/**", "/api/check-phone", "/api/phone/request","/api/phone/verify","/api/signup").permitAll()  // 로그인은 누구나 접근 가능, 비인증 허용
+                .requestMatchers("/api/login/**", "/api/check-phone", "/api/phone/request","/api/phone/verify","/api/signup","/api/Match/**").permitAll()  // 로그인은 누구나 접근 가능, 비인증 허용
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // 관리자만 접근 가능
                 .anyRequest().authenticated()              // 나머지는 로그인 필요
             .and()
