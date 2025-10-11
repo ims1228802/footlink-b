@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
@@ -27,12 +28,6 @@ public class TeamServiceImpl implements TeamService{
 		return teamList;
 	}
 
-	public List<Team> getSearchTeamList(String param) {
-		log.info("param: {}", param);
-		List<Team> searchTeamList = teamMapper.getSearchTeamList(param);
-		return searchTeamList;
-	}
-
 	@Override
 	public List<StadiumArea> getArea() {
 		return teamMapper.getArea();
@@ -51,6 +46,21 @@ public class TeamServiceImpl implements TeamService{
 	@Override
 	public void addTeamState(State param) {
 		teamMapper.addTeamState(param);
+	}
+
+	@Override
+	public Team getTeamDetail(String teamCode) {
+		return teamMapper.getTeamDetail(teamCode);
+	}
+
+	@Override
+	public List<MyInfo> getTeamUserList(String teamCode) {
+		return teamMapper.getTeamUserList(teamCode);
+	}
+
+	@Override
+	public State getTeamState(String teamCode) {
+		return teamMapper.getTeamState(teamCode);
 	}
 	
 }

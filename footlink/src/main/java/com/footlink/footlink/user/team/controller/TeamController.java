@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.Team;
 import com.footlink.footlink.user.team.domain.State;
@@ -32,7 +33,7 @@ public class TeamController {
 	private final TeamService teamService;
 	private String weekStr = "";
 	
-	@GetMapping(value = "/team")
+	@GetMapping(value = "team/teamList")
 	public List<Team> getTeamList(String param) {
 		List<Team> teamList =  teamService.getTeamList();
 		return teamList;
@@ -50,14 +51,30 @@ public class TeamController {
 		return stadium;
 	}
 	
-	@PostMapping("/searchTeam")
-	public List<Team> getSearchTeamList(@RequestBody Object params) {
-		log.info("input: {}", params);
-		List<Team> teamSearchList = teamService.getSearchTeamList(params.toString());
-		return teamSearchList;
+	// 팀 상세 조회
+	@GetMapping("team/teamDetail")
+	public Team getTeamDetail(@RequestParam String teamCode) {
+		log.info("input: {}", teamCode);
+		Team teamDetail = teamService.getTeamDetail(teamCode);
+		return teamDetail;
 	}
 	
-	@PostMapping("/addTeam")
+	// 팀 스탯 정보 조회
+	@GetMapping("team/states")
+	public State getTeamState(@RequestParam String teamCode) {
+		State teamState = teamService.getTeamState(teamCode);
+		return teamState;
+	}
+	
+	// 팀에 포함된 유저 조회
+	@GetMapping("team/userInfo")
+	public List<MyInfo> getTeamUserList(@RequestParam String teamCode) {
+		List<MyInfo> teamUserList = teamService.getTeamUserList(teamCode);
+		return teamUserList;
+	}
+	
+	// 팀 추가하기
+	@PostMapping("team/addTeam")
 	public ResponseEntity<String> addTeam(@RequestBody Map<String, Object> team) {
 		// State 객체 새로 생성
 		State state = new State();
@@ -79,16 +96,17 @@ public class TeamController {
 		// 대괄호 제거 후 쉼표로 자르기
 		String[] weekRepleace = team.get("week").toString().replaceAll("[\\[\\]]", "").split(", ");
 		
-		Arrays.stream(weekRepleace).forEach((idx) -> {
-			if(weekRepleace.length == 7) {
-				weekStr = "매일";
-			}
-			else if(Integer.parseInt(idx) == weekRepleace.length) {
-				weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]);
-			}else {
-				weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]).concat(",");				
-			}
-		});
+		if(weekRepleace.length == 7) {
+			weekStr = "매일";
+		}else {
+			Arrays.stream(weekRepleace).forEach((idx) -> {
+				if(Integer.parseInt(idx) == weekRepleace.length) {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]);
+				}else {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]).concat(",");				
+				}
+			});			
+		}
 		
 		log.info("week: {}", weekStr);
 		
