@@ -1,5 +1,8 @@
 package com.footlink.footlink.user.myinfo.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,42 +28,53 @@ public class MyInfoServiceImpl implements MyInfoService {
 
 	@Override
 	public MyInfo getMyInfoByEmail(String email) {
-		log.info("📩 내 정보 조회 요청: {}", email);
-
 		MyInfo myInfo = myInfoMapper.getMyInfoByEmail(email);
-
-		if (myInfo == null) {
-			log.warn("⚠️ 존재하지 않는 사용자: {}", email);
-		} else {
-			log.info("✅ 사용자 정보 조회 성공: {}", myInfo.getName());
-		}
-
 		return myInfo;
 	}
 
 	@Transactional
 	@Override
 	public void modify(MyInfo myInfo, MultipartFile file) {
-		try {
-			// ✅ 파일이 있을 경우에만 업로드 처리
-			if (file != null && !file.isEmpty()) {
-				// ✅ FilesUtils 사용
-				FileDto fileDto = filesUtils.uploadFile(file);
+        try {
+            log.info("🔧 사용자 정보 수정 시작 - 이메일: {}", myInfo.getEmail());
 
-				// ✅ files 테이블 insert
-				fileMapper.addfile(fileDto);
+            // 파일 업로드 처리
+            if (file != null && !file.isEmpty()) {
+                log.info("📂 업로드된 파일 처리 중... 파일명: {}", file.getOriginalFilename());
 
-				// ✅ user 테이블 user_img에 file_idx 저장
-				myInfo.setProfile(fileDto.getFileIdx());
-			}
+                // 1 파일 저장 
+                FileDto fileDto = filesUtils.uploadFile(file);
+                if (fileDto == null) {
+                    throw new RuntimeException("파일 업로드 실패");
+                }
 
-			// ✅ 사용자 정보 수정
-			myInfoMapper.modifyMyInfo(myInfo);
-			log.info("✅ 사용자 정보 수정 성공: {}", myInfo.getEmail());
+                // 2️ file_idx 생성 
+                String nextFileIdx = fileMapper.getNextFileIdx();
+                if (nextFileIdx == null || nextFileIdx.isBlank()) {
+                    nextFileIdx = "file_001";
+                }
+                fileDto.setFileIdx(nextFileIdx);
 
-		} catch (Exception e) {
-			log.error("❌ 사용자 정보 수정 실패", e);
-			throw new RuntimeException("정보 수정 실패", e);
-		}
+                // 3️ DB에 파일 등록
+                fileMapper.addfile(fileDto);
+                log.info("✅ 파일 등록 완료 - file_idx: {}", fileDto.getFileIdx());
+
+                // 4️ 사용자 DTO에 연결
+                myInfo.setProfile(fileDto.getFileIdx());
+            }
+
+            // 5️ 사용자 정보 수정
+            myInfoMapper.modifyMyInfo(myInfo);
+            log.info("✅ 사용자 정보 수정 완료 - 이메일: {}", myInfo.getEmail());
+
+        } catch (Exception e) {
+            log.error("❌ 사용자 정보 수정 실패", e);
+            throw new RuntimeException("정보 수정 실패", e);
+        }
+    }
+
+	@Override
+	public List<Map<String, Object>> getMyTeamsByEmail(String email) {
+		return myInfoMapper.getMyTeamsByEmail(email);
 	}
 }

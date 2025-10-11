@@ -1,10 +1,14 @@
 package com.footlink.footlink.user.myinfo.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -28,7 +32,6 @@ public class MyInfoController {
 
 	@GetMapping("/user/my-info")
 	public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal String email) {
-        log.info("📧 로그인 사용자 이메일: {}", email);
 
         MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
         if (myInfo == null) {
@@ -47,4 +50,18 @@ public class MyInfoController {
         myInfoService.modify(myInfo, file);
         return ResponseEntity.ok("정보 수정 완료");
     }
+    
+    @GetMapping("/user/my-team/{email}")
+    public ResponseEntity<?> getMyTeamsByEmail(@PathVariable String email) {
+        try {
+            List<Map<String, Object>> myTeam = myInfoService.getMyTeamsByEmail(email);
+            return ResponseEntity.ok(myTeam);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("소속 팀 정보를 불러오는 중 오류가 발생했습니다.");
+        }
+    }
+    
+    
 }

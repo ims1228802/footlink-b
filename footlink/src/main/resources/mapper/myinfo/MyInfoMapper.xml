@@ -67,11 +67,35 @@
 			<if test="addr != null and addr != ''">
 				user_addr = #{addr},
 			</if>
-			<if test="userImg != null and userImg != ''">
-				user_img = #{userImg},
+			<if test="profile != null and profile != ''">
+				user_img = #{profile},
 			</if>
 		</set>
 		WHERE user_email = #{email}
 	</update>
 
+	<select id="getMyTeamsByEmail" resultType="map">
+		SELECT
+		t.team_cd AS teamCd,
+		t.team_nm AS teamNm,
+		t.rgn_nm AS rgnNm,
+		t.gender AS gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow AS actDow,
+		l.tier AS level,
+		COUNT(tu.user_cd) AS memberCount
+		FROM team t
+		JOIN team_user tu
+		ON t.team_cd = tu.team_cd
+		JOIN user u
+		ON tu.user_cd = u.user_id
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		WHERE u.user_email = #{email}
+		GROUP BY
+		t.team_cd, t.team_nm, t.rgn_nm, t.gender,
+		ta.team_age_name, t.act_dow, l.tier
+	</select>
 </mapper>
