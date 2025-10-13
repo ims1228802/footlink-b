@@ -23,6 +23,18 @@
 		<result property="pst" column="user_pst" />
 		<result property="level" column="user_level" />
 		<result property="intro" column="user_intro" />
+
+		<!-- ✅ 팀 리스트 매핑 -->
+		<collection property="teams"
+			ofType="com.footlink.footlink.user.myinfo.domain.MyTeam">
+			<result property="teamCd" column="team_cd" />
+			<result property="teamNm" column="team_nm" />
+			<result property="rgnNm" column="rgn_nm" />
+			<result property="gender" column="gender" />
+			<result property="ageGroup" column="ageGroup" />
+			<result property="actDow" column="act_dow" />
+			<result property="level" column="level" />
+		</collection>
 	</resultMap>
 
 	<!-- ✅ 이메일 기준으로 내 정보 조회 -->
@@ -41,13 +53,22 @@
 		u.user_pst,
 		u.user_level,
 		u.user_intro,
-		f.file_path
+		f.file_path,
+		t.team_cd,
+		t.team_nm,
+		t.rgn_nm,
+		t.gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow,
+		l.tier AS level
 		FROM user u
-		LEFT JOIN files f ON
-		u.user_img = f.file_idx
+		LEFT JOIN files f ON u.user_img = f.file_idx
+		LEFT JOIN team_user tu ON u.user_id = tu.user_cd
+		LEFT JOIN team t ON tu.team_cd = t.team_cd
+		LEFT JOIN team_age ta ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l ON t.level_cd = l.level_cd
 		WHERE u.user_email = #{email}
 	</select>
-
 	<update id="modifyMyInfo"
 		parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
 		UPDATE user
@@ -76,26 +97,32 @@
 
 	<select id="getMyTeamsByEmail" resultType="map">
 		SELECT
-		t.team_cd AS teamCd,
+		t.team_cd AS
+		teamCd,
 		t.team_nm AS teamNm,
 		t.rgn_nm AS rgnNm,
 		t.gender AS gender,
 		ta.team_age_name AS ageGroup,
 		t.act_dow AS actDow,
 		l.tier AS level,
-		COUNT(tu.user_cd) AS memberCount
+		(
+		SELECT COUNT(*)
+		FROM team_user tu2
+		WHERE tu2.team_cd = t.team_cd
+		) AS
+		memberCount
 		FROM team t
 		JOIN team_user tu
 		ON t.team_cd = tu.team_cd
-		JOIN user u
+		JOIN
+		user u
 		ON tu.user_cd = u.user_id
 		LEFT JOIN team_age ta
-		ON t.team_age = ta.team_age_cd
+		ON t.team_age =
+		ta.team_age_cd
 		LEFT JOIN levels l
 		ON t.level_cd = l.level_cd
-		WHERE u.user_email = #{email}
-		GROUP BY
-		t.team_cd, t.team_nm, t.rgn_nm, t.gender,
-		ta.team_age_name, t.act_dow, l.tier
+		WHERE
+		u.user_email = #{email}
 	</select>
 </mapper>
