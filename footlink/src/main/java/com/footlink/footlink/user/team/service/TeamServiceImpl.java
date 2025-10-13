@@ -1,10 +1,12 @@
 package com.footlink.footlink.user.team.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.team.domain.Calendar;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
@@ -61,6 +63,21 @@ public class TeamServiceImpl implements TeamService{
 	@Override
 	public State getTeamState(String teamCode) {
 		return teamMapper.getTeamState(teamCode);
+	}
+
+	@Override
+	public void addTeamUser(String teamCode, String userId) {
+		HashMap<String, String> map = new HashMap<>();
+		
+		map.put("teamCode", teamCode);
+		map.put("userId", userId);
+		
+		teamMapper.addTeamUser(map);
+	}
+
+	@Override
+	public void addCalendar(Calendar calendar) {
+		teamMapper.addCalendar(calendar);
 	}
 	
 }

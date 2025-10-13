@@ -1,8 +1,10 @@
 package com.footlink.footlink.user.team.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.team.domain.Calendar;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.Team;
 import com.footlink.footlink.user.team.domain.State;
@@ -92,6 +95,7 @@ public class TeamController {
 		String teamAge = team.get("age").toString();
 		String level = team.get("level").toString();
 		String stadium = team.get("stadium").toString();
+		String userId = team.get("userId").toString();
 		
 		// 대괄호 제거 후 쉼표로 자르기
 		String[] weekRepleace = team.get("week").toString().replaceAll("[\\[\\]]", "").split(", ");
@@ -99,13 +103,13 @@ public class TeamController {
 		if(weekRepleace.length == 7) {
 			weekStr = "매일";
 		}else {
-			Arrays.stream(weekRepleace).forEach((idx) -> {
-				if(Integer.parseInt(idx) == weekRepleace.length) {
-					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]);
+			IntStream.range(0, weekRepleace.length).forEach(idx -> {
+				if(idx == weekRepleace.length - 1) {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]);
 				}else {
-					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]).concat(",");				
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]).concat(",");				
 				}
-			});			
+			});
 		}
 		
 		log.info("week: {}", weekStr);
@@ -169,8 +173,6 @@ public class TeamController {
 		}
 		
 		// 연령대
-		
-		
 		teamDTO.setIsTemp("정석");
 		
 		//log 출력
@@ -181,7 +183,44 @@ public class TeamController {
 		// 각각 state 테이블과 team 테이블에 데이터 추가
 		teamService.addTeamInfo(teamDTO);
 		teamService.addTeamState(state);
+		teamService.addTeamUser(teamCode, userId);
+		
+		weekStr = "";
+		
 		return ResponseEntity.ok("팀 등록 성공");
 	}
 	
+	// 일정 추가하기
+	@PostMapping("team/calendar")
+	public ResponseEntity<String> addCalendar(@RequestBody Map<String, Object> calendar){
+		Calendar calendarDTO = new Calendar();
+		HashMap<String, String> calendarDetail = (HashMap<String, String>) calendar.get("params");
+		
+		// 가져온 데이터 정의
+		String title = calendarDetail.get("title");
+		String location = calendarDetail.get("location");
+		String date = calendarDetail.get("date");
+		String startTime = calendarDetail.get("startTime");
+		String endTime = calendarDetail.get("endTime");
+		String contents = calendarDetail.get("contents");
+		String teamCode = calendarDetail.get("teamCode");
+		
+		log.info("calendar: {}", calendar);
+		
+		System.out.println(calendarDetail);
+		System.out.println(calendarDetail.get("title"));
+		
+		// 가져온 데이터 셋팅
+		calendarDTO.setTitle(title);
+		calendarDTO.setPlaceName(location);
+		calendarDTO.setDate(date);
+		calendarDTO.setStartTime(startTime);
+		calendarDTO.setEndTime(endTime);
+		calendarDTO.setContents(contents);
+		calendarDTO.setTeamCode(teamCode);
+		
+		teamService.addCalendar(calendarDTO);
+		
+		return ResponseEntity.ok("일정 등록 성공");
+	}
 }

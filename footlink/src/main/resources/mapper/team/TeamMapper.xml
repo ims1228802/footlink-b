@@ -197,4 +197,50 @@
 			);
 	</insert>
 	
+	<insert id="addTeamUser" parameterType="Map">
+		INSERT INTO team_user(
+				team_cd, 
+				user_cd
+			)
+		VALUES (
+				#{teamCode}, 
+				#{userId}
+			);
+	</insert>
+	
+	<insert id="addCalendar" parameterType="com.footlink.footlink.user.team.domain.Calendar">
+		INSERT INTO team_schedules(
+				team_dt_cd, 
+				team_cd, 
+				ttl, 
+				plc_nm, 
+				prnmnt_ymd, 
+				bgng_time, 
+				end_time, 
+				dtl_cn, 
+				reg_ymd
+				)
+		VALUES (
+				(
+				SELECT 
+					CASE
+						WHEN CONVERT(SUBSTRING(team_dt_cd,9), UNSIGNED) + 1 &lt; 100 THEN CONCAT('team_dt_', LPAD(CONVERT(SUBSTRING(team_dt_cd,9), UNSIGNED) + 1, 2, '0'))
+						WHEN CONVERT(SUBSTRING(team_dt_cd,9), UNSIGNED) + 1 >= 100 THEN CONCAT('team_dt_', CONVERT(SUBSTRING(team_dt_cd,9), UNSIGNED) + 1)
+					END
+				FROM 
+					(SELECT team_dt_cd FROM team_schedules) AS temp
+				ORDER BY CONVERT(SUBSTRING(team_dt_cd,9), UNSIGNED) DESC
+				LIMIT 1
+				), 
+				#{teamCode}, 
+				#{title}, 
+				#{placeName}, 
+				#{date}, 
+				#{startTime}, 
+				#{endTime}, 
+				#{contents}, 
+				NOW()
+				);
+	</insert>
+	
 </mapper>
