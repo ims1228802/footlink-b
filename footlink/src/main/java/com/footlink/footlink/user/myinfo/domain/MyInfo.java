@@ -2,6 +2,7 @@ package com.footlink.footlink.user.myinfo.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Data;
 
@@ -21,4 +22,6 @@ public class MyInfo {
     private String pst;         // 포지션
     private String level;       // 레벨
     private String intro;       // 자기소개
+    private String filePath;
+    private List<MyTeam> teams;
 }
