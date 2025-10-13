@@ -3,6 +3,7 @@ package com.footlink.footlink.user.team.service;
 import java.util.List;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.team.domain.Calendar;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
@@ -16,4 +17,6 @@ public interface TeamService {
 	State getTeamState(String teamCode);				// 팀 스텟 조회
 	void addTeamInfo(Team param);						// 팀 등록
 	void addTeamState(State param);						// 팀 능력치 등록
+	void addTeamUser(String teamCode, String userId);	// 팀 유저 등록
+	void addCalendar(Calendar calendar);				// 일정 등록
 }
