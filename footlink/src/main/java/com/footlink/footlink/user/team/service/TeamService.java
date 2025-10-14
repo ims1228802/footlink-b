@@ -15,6 +15,7 @@ public interface TeamService {
 	List<StadiumArea> getStadium();						// 팀 등록 구장 조회
 	List<MyInfo> getTeamUserList(String teamCode);		// 팀에 포함된 사용자 조회
 	State getTeamState(String teamCode);				// 팀 스텟 조회
+	List<Calendar> getTeamCalendar(String teamCode);	// 팀 일정 조회
 	void addTeamInfo(Team param);						// 팀 등록
 	void addTeamState(State param);						// 팀 능력치 등록
 	void addTeamUser(String teamCode, String userId);	// 팀 유저 등록
