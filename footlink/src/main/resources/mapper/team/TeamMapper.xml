@@ -145,6 +145,23 @@
 		WHERE team_cd = #{teamCode};
 	</select>
 	
+	<select id="getTeamCalendar" resultType="com.footlink.footlink.user.team.domain.Calendar" parameterType="String">
+		SELECT 
+			ts.team_dt_cd AS teamDateCode, 
+			ts.team_cd AS teamCode, 
+			ts.ttl AS title, 
+			ts.plc_nm AS placeName, 
+			ts.prnmnt_ymd AS date, 
+			ts.bgng_time AS startTime, 
+			ts.end_time AS endTime, 
+			ts.dtl_cn AS contents, 
+			ts.reg_ymd AS registrationDate
+		FROM
+			team_schedules ts
+		WHERE
+			ts.team_cd = #{teamCode};
+	</select>
+	
 	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
 		INSERT INTO team(
 			 team_cd, 

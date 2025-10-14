@@ -76,6 +76,13 @@ public class TeamController {
 		return teamUserList;
 	}
 	
+	// 팀 일정 리스트 조회
+	@GetMapping("team/calendar")
+	public List<Calendar> getTeamCalendar(@RequestParam String teamCode){
+		List<Calendar> teamCalendar = teamService.getTeamCalendar(teamCode);
+		return teamCalendar;
+	}
+	
 	// 팀 추가하기
 	@PostMapping("team/addTeam")
 	public ResponseEntity<String> addTeam(@RequestBody Map<String, Object> team) {
@@ -191,7 +198,7 @@ public class TeamController {
 	}
 	
 	// 일정 추가하기
-	@PostMapping("team/calendar")
+	@PostMapping("team/postCalendar")
 	public ResponseEntity<String> addCalendar(@RequestBody Map<String, Object> calendar){
 		Calendar calendarDTO = new Calendar();
 		HashMap<String, String> calendarDetail = (HashMap<String, String>) calendar.get("params");

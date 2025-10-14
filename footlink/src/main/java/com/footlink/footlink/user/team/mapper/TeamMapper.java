@@ -20,6 +20,7 @@ public interface TeamMapper {
 	Team getTeamDetail(String teamCode);
 	List<MyInfo> getTeamUserList(String teamCode);
 	State getTeamState(String teamCode);
+	List<Calendar> getTeamCalendar(String teamCode);
 	void addTeamInfo(Team param);
 	void addTeamState(State param);
 	void addTeamUser(Map<String, String> map);

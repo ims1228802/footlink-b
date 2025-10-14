@@ -79,5 +79,10 @@ public class TeamServiceImpl implements TeamService{
 	public void addCalendar(Calendar calendar) {
 		teamMapper.addCalendar(calendar);
 	}
+
+	@Override
+	public List<Calendar> getTeamCalendar(String teamCode) {
+		return teamMapper.getTeamCalendar(teamCode);
+	}
 	
 }
