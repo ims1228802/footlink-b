@@ -3,45 +3,126 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.footlink.footlink.user.myinfo.mapper.MyInfoMapper">
+<mapper
+	namespace="com.footlink.footlink.user.myinfo.mapper.MyInfoMapper">
 
-    <!-- 결과 매핑 -->
-    <resultMap id="MyInfoMap" type="com.footlink.footlink.user.myinfo.domain.MyInfo">
-        <id property="id" column="user_id" />
-        <result property="role" column="authrt_cd" />
-        <result property="email" column="user_email" />
-        <result property="phone" column="user_phn_num" />
-        <result property="birth" column="user_birth" />
-        <result property="gender" column="user_gender" />
-        <result property="addr" column="user_addr" />
-        <result property="joinYmd" column="join_ymd" />
-        <result property="name" column="user_nm" />
-        <result property="profile" column="user_img" />
-        <result property="pstAbly" column="user_pst_ably" />
-        <result property="pst" column="user_pst" />
-        <result property="level" column="user_level" />
-        <result property="intro" column="user_intro" />
-    </resultMap>
+	<!-- 결과 매핑 -->
+	<resultMap id="MyInfoMap"
+		type="com.footlink.footlink.user.myinfo.domain.MyInfo">
+		<id property="id" column="user_id" />
+		<result property="role" column="authrt_cd" />
+		<result property="email" column="user_email" />
+		<result property="phone" column="user_phn_num" />
+		<result property="birth" column="user_birth" />
+		<result property="gender" column="user_gender" />
+		<result property="addr" column="user_addr" />
+		<result property="joinYmd" column="join_ymd" />
+		<result property="name" column="user_nm" />
+		<result property="profile" column="file_path" />
+		<result property="pstAblty" column="user_pst_ablty" />
+		<result property="pst" column="user_pst" />
+		<result property="level" column="user_level" />
+		<result property="intro" column="user_intro" />
 
-    <!-- ✅ 이메일 기준으로 내 정보 조회 -->
-    <select id="getMyInfoByEmail" resultMap="MyInfoMap">
-        SELECT
-            user_id,
-            authrt_cd,
-            user_email,
-            user_phn_num,
-            user_birth,
-            user_gender,
-            user_addr,
-            join_ymd,
-            user_nm,
-            user_img,
-            user_pst_ably,
-            user_pst,
-            user_level,
-            user_intro
-        FROM user
-        WHERE user_email = #{email}
-    </select>
+		<!-- ✅ 팀 리스트 매핑 -->
+		<collection property="teams"
+			ofType="com.footlink.footlink.user.myinfo.domain.MyTeam">
+			<result property="teamCd" column="team_cd" />
+			<result property="teamNm" column="team_nm" />
+			<result property="rgnNm" column="rgn_nm" />
+			<result property="gender" column="gender" />
+			<result property="ageGroup" column="ageGroup" />
+			<result property="actDow" column="act_dow" />
+			<result property="level" column="level" />
+		</collection>
+	</resultMap>
 
+	<!-- ✅ 이메일 기준으로 내 정보 조회 -->
+	<select id="getMyInfoByEmail" resultMap="MyInfoMap">
+		SELECT
+		u.user_id,
+		u.authrt_cd,
+		u.user_email,
+		u.user_phn_num,
+		u.user_birth,
+		u.user_gender,
+		u.user_addr,
+		u.join_ymd,
+		u.user_nm,
+		u.user_pst_ablty,
+		u.user_pst,
+		u.user_level,
+		u.user_intro,
+		f.file_path,
+		t.team_cd,
+		t.team_nm,
+		t.rgn_nm,
+		t.gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow,
+		l.tier AS level
+		FROM user u
+		LEFT JOIN files f ON u.user_img = f.file_idx
+		LEFT JOIN team_user tu ON u.user_id = tu.user_cd
+		LEFT JOIN team t ON tu.team_cd = t.team_cd
+		LEFT JOIN team_age ta ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l ON t.level_cd = l.level_cd
+		WHERE u.user_email = #{email}
+	</select>
+	<update id="modifyMyInfo"
+		parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+		UPDATE user
+		<set>
+			<if test="name != null and name != ''">
+				user_nm = #{name},
+			</if>
+			<if test="intro != null and intro != ''">
+				user_intro = #{intro},
+			</if>
+			<if test="pst != null and pst != ''">
+				user_pst = #{pst},
+			</if>
+			<if test="pstAblty != null and pstAblty != ''">
+				user_pst_ablty = #{pstAblty},
+			</if>
+			<if test="addr != null and addr != ''">
+				user_addr = #{addr},
+			</if>
+			<if test="profile != null and profile != ''">
+				user_img = #{profile},
+			</if>
+		</set>
+		WHERE user_email = #{email}
+	</update>
+
+	<select id="getMyTeamsByEmail" resultType="map">
+		SELECT
+		t.team_cd AS
+		teamCd,
+		t.team_nm AS teamNm,
+		t.rgn_nm AS rgnNm,
+		t.gender AS gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow AS actDow,
+		l.tier AS level,
+		(
+		SELECT COUNT(*)
+		FROM team_user tu2
+		WHERE tu2.team_cd = t.team_cd
+		) AS
+		memberCount
+		FROM team t
+		JOIN team_user tu
+		ON t.team_cd = tu.team_cd
+		JOIN
+		user u
+		ON tu.user_cd = u.user_id
+		LEFT JOIN team_age ta
+		ON t.team_age =
+		ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		WHERE
+		u.user_email = #{email}
+	</select>
 </mapper>

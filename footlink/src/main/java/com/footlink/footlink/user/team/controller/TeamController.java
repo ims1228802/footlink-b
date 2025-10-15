@@ -1,8 +1,10 @@
 package com.footlink.footlink.user.team.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.team.domain.Calendar;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.Team;
 import com.footlink.footlink.user.team.domain.State;
@@ -32,7 +36,7 @@ public class TeamController {
 	private final TeamService teamService;
 	private String weekStr = "";
 	
-	@GetMapping(value = "/team")
+	@GetMapping(value = "team/teamList")
 	public List<Team> getTeamList(String param) {
 		List<Team> teamList =  teamService.getTeamList();
 		return teamList;
@@ -50,14 +54,37 @@ public class TeamController {
 		return stadium;
 	}
 	
-	@PostMapping("/searchTeam")
-	public List<Team> getSearchTeamList(@RequestBody Object params) {
-		log.info("input: {}", params);
-		List<Team> teamSearchList = teamService.getSearchTeamList(params.toString());
-		return teamSearchList;
+	// 팀 상세 조회
+	@GetMapping("team/teamDetail")
+	public Team getTeamDetail(@RequestParam String teamCode) {
+		log.info("input: {}", teamCode);
+		Team teamDetail = teamService.getTeamDetail(teamCode);
+		return teamDetail;
 	}
 	
-	@PostMapping("/addTeam")
+	// 팀 스탯 정보 조회
+	@GetMapping("team/states")
+	public State getTeamState(@RequestParam String teamCode) {
+		State teamState = teamService.getTeamState(teamCode);
+		return teamState;
+	}
+	
+	// 팀에 포함된 유저 조회
+	@GetMapping("team/userInfo")
+	public List<MyInfo> getTeamUserList(@RequestParam String teamCode) {
+		List<MyInfo> teamUserList = teamService.getTeamUserList(teamCode);
+		return teamUserList;
+	}
+	
+	// 팀 일정 리스트 조회
+	@GetMapping("team/calendar")
+	public List<Calendar> getTeamCalendar(@RequestParam String teamCode){
+		List<Calendar> teamCalendar = teamService.getTeamCalendar(teamCode);
+		return teamCalendar;
+	}
+	
+	// 팀 추가하기
+	@PostMapping("team/addTeam")
 	public ResponseEntity<String> addTeam(@RequestBody Map<String, Object> team) {
 		// State 객체 새로 생성
 		State state = new State();
@@ -75,20 +102,22 @@ public class TeamController {
 		String teamAge = team.get("age").toString();
 		String level = team.get("level").toString();
 		String stadium = team.get("stadium").toString();
+		String userId = team.get("userId").toString();
 		
 		// 대괄호 제거 후 쉼표로 자르기
 		String[] weekRepleace = team.get("week").toString().replaceAll("[\\[\\]]", "").split(", ");
 		
-		Arrays.stream(weekRepleace).forEach((idx) -> {
-			if(weekRepleace.length == 7) {
-				weekStr = "매일";
-			}
-			else if(Integer.parseInt(idx) == weekRepleace.length) {
-				weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]);
-			}else {
-				weekStr = weekStr.concat(weekStrArr[Integer.parseInt(idx)]).concat(",");				
-			}
-		});
+		if(weekRepleace.length == 7) {
+			weekStr = "매일";
+		}else {
+			IntStream.range(0, weekRepleace.length).forEach(idx -> {
+				if(idx == weekRepleace.length - 1) {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]);
+				}else {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]).concat(",");				
+				}
+			});
+		}
 		
 		log.info("week: {}", weekStr);
 		
@@ -151,8 +180,6 @@ public class TeamController {
 		}
 		
 		// 연령대
-		
-		
 		teamDTO.setIsTemp("정석");
 		
 		//log 출력
@@ -163,7 +190,44 @@ public class TeamController {
 		// 각각 state 테이블과 team 테이블에 데이터 추가
 		teamService.addTeamInfo(teamDTO);
 		teamService.addTeamState(state);
+		teamService.addTeamUser(teamCode, userId);
+		
+		weekStr = "";
+		
 		return ResponseEntity.ok("팀 등록 성공");
 	}
 	
+	// 일정 추가하기
+	@PostMapping("team/postCalendar")
+	public ResponseEntity<String> addCalendar(@RequestBody Map<String, Object> calendar){
+		Calendar calendarDTO = new Calendar();
+		HashMap<String, String> calendarDetail = (HashMap<String, String>) calendar.get("params");
+		
+		// 가져온 데이터 정의
+		String title = calendarDetail.get("title");
+		String location = calendarDetail.get("location");
+		String date = calendarDetail.get("date");
+		String startTime = calendarDetail.get("startTime");
+		String endTime = calendarDetail.get("endTime");
+		String contents = calendarDetail.get("contents");
+		String teamCode = calendarDetail.get("teamCode");
+		
+		log.info("calendar: {}", calendar);
+		
+		System.out.println(calendarDetail);
+		System.out.println(calendarDetail.get("title"));
+		
+		// 가져온 데이터 셋팅
+		calendarDTO.setTitle(title);
+		calendarDTO.setPlaceName(location);
+		calendarDTO.setDate(date);
+		calendarDTO.setStartTime(startTime);
+		calendarDTO.setEndTime(endTime);
+		calendarDTO.setContents(contents);
+		calendarDTO.setTeamCode(teamCode);
+		
+		teamService.addCalendar(calendarDTO);
+		
+		return ResponseEntity.ok("일정 등록 성공");
+	}
 }
