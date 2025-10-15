@@ -70,15 +70,28 @@
 		<result column="operating_start_time" 	property="ost"/>
 		<result column="operating_end_time"		property="oet"/>
 	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.ApplyMatch" id="ApplyMatchMap">
+		<id column ="application_id"	property="ApplNo"/>
+		<result column="match_no"	property="matchNo"/>
+		<result column="user_id"	property="userId"/>
+		<result column="application_status"	property="ApplStatus"/>
+		<result column="applied_at"	property="ApplAt"/>
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.EndList" id="EndListMap">
+		<id column="match_no" 					property="matchNo" />
+		<id column="game_sequence" 				property="gameSequence"/>
+		<result column="min_level_name" 		property="minLevelName"/>
+		<result column="max_level_name" 		property="maxLevelName"/>
+		<result column="stadium_nm" 			property="stadiumName"/>
+		<result column="gender_nm"				property="genderName"/>
+		<result column="win_team_cd" 			property="winnerTeam"/>
+		<result column="lose_team_cd" 			property="loserTeam"/>
+		<result column="winning_score" 			property="winScore"/>
+		<result column="losing_score" 			property="loseScore"/>
+	</resultMap>
 	
 	
 	<!-- <select id="getItemInfoByName" parameterType="string" resultMap=""></select> -->
-	<select id="test" resultType="com.footlink.footlink.user.match.domain.Gender">
-		SELECT 
-			gender_cd, gender_nm
-		FROM 
-			genders;
-	</select>
 	<select id="findAllMatch" resultMap="MatchResultMap">
 		SELECT
 		    m.*,
@@ -212,5 +225,76 @@
 			#{gender}, 
 			#{matchType})
 	</insert>
+	<select id="countApplicationByUser" resultType="int">
+	    SELECT COUNT(*)
+	    FROM match_applications
+	    WHERE match_no = #{matchNo} AND user_id = #{userId}
+	</select>
+	<insert id="insertApplication" parameterType="com.footlink.footlink.user.match.domain.ApplyMatch">
+		INSERT INTO match_applications
+			( match_no, user_id, application_status, applied_at)
+		VALUES 
+			( #{matchNo}, #{userId}, '매치 신청', NOW())
+	</insert>
+	<select id="getEndList" resultType="com.footlink.footlink.user.match.domain.EndList">
+		 <![CDATA[
+            WITH game_wins AS (
+                SELECT 
+                    match_no, 
+                    win_team_cd AS team_cd, 
+                    COUNT(*) AS wins
+                FROM 
+                    match_results
+                GROUP BY 
+                    match_no, win_team_cd
+            ), 
+            match_final_teams AS (
+                SELECT 
+                    match_no,
+                    team_cd,
+                    wins,
+                    ROW_NUMBER() OVER(PARTITION BY match_no ORDER BY wins DESC) AS rank_num
+                FROM 
+                    game_wins
+            ),
+            final_scores AS (
+                SELECT
+                    match_no,
+                    MAX(CASE WHEN rank_num = 1 THEN team_cd END) AS final_winner_cd,
+                    MAX(CASE WHEN rank_num = 1 THEN wins END) AS winner_score,
+                    MAX(CASE WHEN rank_num = 2 THEN team_cd END) AS final_loser_cd,
+                    MAX(CASE WHEN rank_num = 2 THEN wins END) AS loser_score
+                FROM
+                    match_final_teams
+                GROUP BY
+                    match_no
+            )
+            SELECT
+                m.match_no,
+                m.match_date,
+                s.stadium_nm,
+                m.gender_nm,
+                min_lvl.tier AS min_level_name,
+                max_lvl.tier AS max_level_name,
+                winner_team.team_nm AS winner_team_name,
+                loser_team.team_nm AS loser_team_name,
+                fs.winner_score,
+                COALESCE(fs.loser_score, 0) AS loser_score
+            FROM
+                final_scores fs
+                INNER JOIN matches m ON fs.match_no = m.match_no
+                INNER JOIN team winner_team ON fs.final_winner_cd = winner_team.team_cd
+                LEFT JOIN team loser_team ON fs.final_loser_cd = loser_team.team_cd
+                INNER JOIN `fields` f ON m.field_no = f.field_no
+                INNER JOIN stadium s ON f.stadium_no = s.stadium_no
+                INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd
+                INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd
+                INNER JOIN match_statuses ms ON m.match_stts_no = ms.match_stts_no
+            WHERE
+                ms.match_stts = '매치 종료'
+            ORDER BY
+                m.match_date DESC
+        ]]>
+	</select>
     
 </mapper>

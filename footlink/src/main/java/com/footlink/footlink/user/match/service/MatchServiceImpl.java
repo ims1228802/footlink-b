@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.footlink.footlink.user.match.domain.AddMatch;
+import com.footlink.footlink.user.match.domain.ApplyMatch;
+import com.footlink.footlink.user.match.domain.EndList;
 import com.footlink.footlink.user.match.domain.Field;
-import com.footlink.footlink.user.match.domain.Gender;
 import com.footlink.footlink.user.match.domain.Match;
 import com.footlink.footlink.user.match.domain.MatchDetail;
 import com.footlink.footlink.user.match.domain.Province;
@@ -35,7 +36,23 @@ public class MatchServiceImpl implements MatchService{
 		
 		return matchMapper.getfieldList(staNO);
 	}
-	
+	@Override
+	public void applyMatch(String matchNo, String userId) {
+        // 1. 먼저 이미 신청 내역이 있는지 확인 (창고 관리인에게 물어봄)
+        int count = matchMapper.countApplicationByUser(matchNo, userId);
+
+        // 2. 신청 내역이 없다면 INSERT 실행 (요리 시작)
+        if (count == 0) {
+            ApplyMatch application = ApplyMatch.builder()
+                                        .matchNo(matchNo)
+                                        .userId(userId)
+                                        .build();
+            matchMapper.insertApplication(application);
+        } else {
+            // 3. 이미 신청 내역이 있다면 예외를 발생시켜 컨트롤러에게 알림
+            throw new IllegalStateException("이미 신청한 매치입니다.");
+        }
+    }
 	@Override
 	public List<Stadium> stadiumList() {
 		
@@ -64,12 +81,6 @@ public class MatchServiceImpl implements MatchService{
 		return matchMapper.findAllMatch();
 	}
 
-	@Override
-	public List<Gender> test() {
-		
-		return matchMapper.test();
-	}
-	
 	@Override
 	public AddMatch addmatch(AddMatch addMatch) {
 		
@@ -117,17 +128,19 @@ public class MatchServiceImpl implements MatchService{
 		addMatch.setMatchType(matchTypeCode);
 		
 		int result = matchMapper.addMatch(addMatch);
-		
-	    // INSERT가 성공했는지 확인
+
 	    if (result == 1) {
-	        // 성공했다면, 컨트롤러에게 전달할 addMatch 객체를 그대로 반환
-	        // (만약 INSERT 후 생성된 ID를 다시 조회해서 반환해야 한다면 
-	        //  이곳에서 findById 같은 메서드를 추가로 호출합니다)
+	        
 	        return addMatch;
 	    } else {
-	        // INSERT에 실패한 경우, 예외를 발생시키거나 null을 반환
-	        // throw new RuntimeException("매치 등록에 실패했습니다.");
+	       
 	        return null;
 	    }
 	}
+	@Override
+	public List<EndList> getEndList() {
+		
+		return matchMapper.getEndList();
+	}
+	
 }

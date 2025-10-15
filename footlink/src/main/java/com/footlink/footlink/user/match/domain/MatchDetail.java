@@ -36,12 +36,12 @@ public class MatchDetail {
 	private String matchTypeName;
 	private String region;
 	private int totalPlayers;
-	private String showerYn;
-	private String restYn;
-	private String parkingYn;
-	private String shoRtYn;
-	private String vestRtYn;
-	private String ballRtYn;
-	private String sellDrink;
+	private String showerYn;		//샤워실 유무
+	private String restYn;			//화장실 유무
+	private String parkingYn;		//주차장 유무
+	private String shoRtYn;			//풋살화 대여 유무
+	private String vestRtYn;		//조끼 대여 유무
+	private String ballRtYn;		//풋살공 대여 유무
+	private String sellDrink;		//음료 판매 유무
 	
 }
