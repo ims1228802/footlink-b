@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.Calendar;
+import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
@@ -25,4 +26,5 @@ public interface TeamMapper {
 	void addTeamState(State param);
 	void addTeamUser(Map<String, String> map);
 	void addCalendar(Calendar params);
+	void addTeamRecruit(Recruit recruit);
 }
