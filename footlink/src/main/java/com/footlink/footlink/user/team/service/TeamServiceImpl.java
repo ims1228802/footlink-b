@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.Calendar;
+import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
@@ -83,6 +84,11 @@ public class TeamServiceImpl implements TeamService{
 	@Override
 	public List<Calendar> getTeamCalendar(String teamCode) {
 		return teamMapper.getTeamCalendar(teamCode);
+	}
+
+	@Override
+	public void addTeamRecruit(Recruit recruit) {
+		teamMapper.addTeamRecruit(recruit);
 	}
 	
 }

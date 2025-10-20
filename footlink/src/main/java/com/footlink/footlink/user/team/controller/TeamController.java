@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RecursiveAction;
 import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.Calendar;
+import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.Team;
 import com.footlink.footlink.user.team.domain.State;
@@ -229,5 +231,68 @@ public class TeamController {
 		teamService.addCalendar(calendarDTO);
 		
 		return ResponseEntity.ok("일정 등록 성공");
+	}
+	
+	// 팀원 모집 추가
+	@PostMapping("team/addTeamRecruit")
+	public ResponseEntity<String> addRecruit(@RequestBody Map<String, String> recruit){
+		Recruit recruitDTO = new Recruit();
+		
+		String teamCode = recruit.get("teamCode");
+		String teamDistinction = recruit.get("teamDistinction");
+		String stadium = recruit.get("stadium");
+		String city = recruit.get("city");
+		String area = recruit.get("area");
+		String age = recruit.get("age");
+		String gender = recruit.get("gender");
+		String level = recruit.get("level");
+		String teamImg = recruit.get("teamImg");
+		String contents = recruit.get("contents");
+		
+		// 성별
+		switch(gender) {
+		case "man":
+			recruitDTO.setGender("남자");
+			break;
+		case "woman":
+			recruitDTO.setGender("여자");
+			break;
+		default:
+			recruitDTO.setGender("남녀모두");
+			break;
+		}
+		
+		// 레벨
+		switch(level) {
+		case "noneLevel":
+			recruitDTO.setLevel("실력무관");
+			break;
+		case "beginner":
+			recruitDTO.setLevel("비기너");
+			break;
+		case "amateur":
+			recruitDTO.setLevel("아마추어");
+			break;
+		case "semiPro":
+			recruitDTO.setLevel("세미프로");
+			break;
+		case "pro":
+			recruitDTO.setLevel("프로");
+			break;
+		}
+		
+		recruitDTO.setAge(age);
+		recruitDTO.setArea(area);
+		recruitDTO.setCity(city);
+		recruitDTO.setContents(contents);
+		recruitDTO.setStadium(stadium);
+		recruitDTO.setTeamCode(teamCode);
+		recruitDTO.setTeamDistinction(teamDistinction);
+		
+		teamService.addTeamRecruit(recruitDTO);
+		
+		log.info("recruit: {}", recruit);
+		
+		return ResponseEntity.ok("팀원 모집 등록 성공");
 	}
 }

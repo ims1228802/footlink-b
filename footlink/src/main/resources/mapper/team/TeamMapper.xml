@@ -260,4 +260,39 @@
 				);
 	</insert>
 	
+	<insert id="addTeamRecruit" parameterType="com.footlink.footlink.user.team.domain.Recruit">
+		INSERT INTO team_recruit_post(
+				rcrt_aply_cd, 
+				team_cd, 
+				rcrt_aply_cn, 
+				rcrt_aply_dt, 
+				file_no, 
+				rcrt_team_age, 
+				rcrt_gender, 
+				rcrt_level,
+				rcrt_team_dvsn
+			)
+		VALUES (
+			(
+				SELECT 
+					CASE
+						WHEN CONVERT(SUBSTRING(rcrt_aply_cd,11), UNSIGNED) + 1 &lt; 100 THEN CONCAT('rcrt_aply_', LPAD(CONVERT(SUBSTRING(rcrt_aply_cd,11), UNSIGNED) + 1, 2, '0'))
+						WHEN CONVERT(SUBSTRING(rcrt_aply_cd,11), UNSIGNED) + 1 >= 100 THEN CONCAT('rcrt_aply_', CONVERT(SUBSTRING(rcrt_aply_cd,11), UNSIGNED) + 1)
+					END
+				FROM 
+					(SELECT rcrt_aply_cd FROM team_recruit_post) AS temp
+				ORDER BY CONVERT(SUBSTRING(rcrt_aply_cd,11), UNSIGNED) DESC
+				LIMIT 1
+			), 
+			#{teamCode}, 
+			#{contents}, 
+			NOW(), 
+			NULL, 
+			(SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{age}, '%')),  
+			#{gender}, 
+			#{level},
+			#{teamDistinction}
+			);
+	</insert>
+	
 </mapper>
