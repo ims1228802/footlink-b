@@ -35,7 +35,8 @@
 			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
 			s.stadium_nm,
 			t.gender,
-			t.act_dow
+			t.act_dow,
+			t.is_deleted
 		FROM
 			team t
 		LEFT JOIN meeting_times m
@@ -45,7 +46,9 @@
 		LEFT JOIN levels l
 		ON t.level_cd = l.level_cd
 		LEFT JOIN stadium s
-		ON t.stadium = s.stadium_no;
+		ON t.stadium = s.stadium_no
+		WHERE
+		 t.is_deleted = 0;
 	</select>
 	
 	<select id="getSearchTeamList" resultMap="TeamList" parameterType="String">
@@ -116,7 +119,8 @@
 		ON t.level_cd = l.level_cd
 		LEFT JOIN stadium s
 		ON t.stadium = s.stadium_no
-		WHERE t.team_cd = #{teamCode};
+		WHERE 
+			t.team_cd = #{teamCode};
 	</select>
 	
 	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
@@ -127,7 +131,8 @@
 		`user` u
 		LEFT JOIN team_user tu
 		ON u.user_id = tu.user_cd
-		WHERE tu.team_cd = #{teamCode};
+		WHERE 
+			tu.team_cd = #{teamCode};
 	</select>
 	
 	<select id="getTeamState" resultType="com.footlink.footlink.user.team.domain.State" parameterType="String">
@@ -142,7 +147,8 @@
 			ts.shot
 		FROM
 			team_state ts
-		WHERE team_cd = #{teamCode};
+		WHERE 
+			team_cd = #{teamCode};
 	</select>
 	
 	<select id="getTeamCalendar" resultType="com.footlink.footlink.user.team.domain.Calendar" parameterType="String">
@@ -295,4 +301,21 @@
 			);
 	</insert>
 	
+	<update id="deleteTeam" parameterType="String">
+		UPDATE team
+		<set>
+			is_deleted = 1
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
+	
+	<delete id="deleteTeamUser" parameterType="Map">
+		DELETE FROM team_user
+		WHERE
+			user_cd = #{userId}
+		AND
+			team_cd = #{teamCode}
+	</delete>
 </mapper>

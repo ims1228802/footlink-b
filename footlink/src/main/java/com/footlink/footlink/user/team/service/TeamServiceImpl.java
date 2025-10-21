@@ -90,5 +90,20 @@ public class TeamServiceImpl implements TeamService{
 	public void addTeamRecruit(Recruit recruit) {
 		teamMapper.addTeamRecruit(recruit);
 	}
+
+	@Override
+	public void deleteTeam(String teamCode) {
+		teamMapper.deleteTeam(teamCode);
+	}
+
+	@Override
+	public void deleteTeamUser(String teamCode, String id) {
+		HashMap<String, String> userInfo = new HashMap<>();
+		
+		userInfo.put("teamCode", teamCode);
+		userInfo.put("userId", id);
+		
+		teamMapper.deleteTeamUser(userInfo);
+	}
 	
 }

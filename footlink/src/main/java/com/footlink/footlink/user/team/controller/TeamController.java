@@ -9,8 +9,10 @@ import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @RestController
@@ -197,6 +200,33 @@ public class TeamController {
 		weekStr = "";
 		
 		return ResponseEntity.ok("팀 등록 성공");
+	}
+	
+	// 팀 삭제하기
+	@PutMapping("/team/deleteTeam")
+	public ResponseEntity<String> deleteTeam(@RequestBody Map<String, Object> params){
+		HashMap<String, String> teamCodeObj = (HashMap<String, String>) params.get("params");
+		
+		String teamCode = teamCodeObj.get("teamCode");
+		
+		log.info("teamCode: {}", teamCode);
+		
+		teamService.deleteTeam(teamCode);
+		
+		return ResponseEntity.ok("팀 삭제 완료");
+	}
+	
+	// 팀 탈퇴하기
+	@DeleteMapping("/team/outTeam")
+	public ResponseEntity<String> userOutTeam(@RequestParam String teamCode, 
+											  @RequestParam(value = "user") String id){
+		
+		log.info("user: {}", teamCode);
+		log.info("user: {}", id);
+		
+		teamService.deleteTeamUser(teamCode, id);
+		
+		return ResponseEntity.ok("틸 탈퇴 완료");
 	}
 	
 	// 일정 추가하기

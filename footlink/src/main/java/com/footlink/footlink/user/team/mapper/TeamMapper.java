@@ -23,6 +23,8 @@ public interface TeamMapper {
 	State getTeamState(String teamCode);
 	List<Calendar> getTeamCalendar(String teamCode);
 	void addTeamInfo(Team param);
+	void deleteTeam(String teamCode);
+	void deleteTeamUser(Map userInfo);
 	void addTeamState(State param);
 	void addTeamUser(Map<String, String> map);
 	void addCalendar(Calendar params);
