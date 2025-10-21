@@ -21,4 +21,5 @@ public interface MatchService {
 	List<MatchDetail> getMatchInfo(String matchNo);
 	void applyMatch(String matchNo, String userId);
 	List<EndList> getEndList();
+	List<Match> adminMatchList();
 }

@@ -3,20 +3,22 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.footlink.footlink.user.match.mapper.MatchMapper">
 	<resultMap type="com.footlink.footlink.user.match.domain.Match" id="MatchResultMap">
-			<id column="match_no" 			property="matchNo"/>
-			<result column="field_nm" 		property="fieldName" />
-			<result column="file_path" 		property="filePath"/>
-			<result column="match_date" 	property="matchDate" />
-			<result column="stadium_nm" 	property="staName"/>
-			<result column="stadium_addr" 	property="staAddr"/>
-			<result column="match_time" 	property="matchTime" />
-			<result column="match_end_time" property="matchEndTime"/>
-			<result column="min_level_name" property="minLevelName"/>
-			<result column="max_level_name" property="maxLevelName"/>
-			<result column="total_players"  property="totalPlayers"/>
-			<result column="gender_nm" 		property="genderName" />
-			<result column="match_type_nm"  property="matchTypeName" />
-			<result column="name" 			property="region"/>
+			<id column="match_no" 				property="matchNo"/>
+			<result column="field_nm" 			property="fieldName" />
+			<result column="file_path" 			property="filePath"/>
+			<result column="match_date" 		property="matchDate" />
+			<result column="stadium_nm" 		property="staName"/>
+			<result column="stadium_addr" 		property="staAddr"/>
+			<result column="match_time" 		property="matchTime" />
+			<result column="match_end_time" 	property="matchEndTime"/>
+			<result column="min_level_name" 	property="minLevelName"/>
+			<result column="max_level_name" 	property="maxLevelName"/>
+			<result column="total_players"  	property="totalPlayers"/>
+			<result column="gender_nm" 			property="genderName" />
+			<result column="match_stts" 		property="matchStts"/>
+			<result column="match_type_nm"  	property="matchTypeName" />
+			<result column="name" 				property="region"/>
+			<result column="application_count" 	property="applyCount" />
 	</resultMap>
 	<resultMap type="com.footlink.footlink.user.match.domain.MatchDetail" id="MatchDetailMap">
 			<id column="match_no" 					property="matchNo"/>
@@ -90,8 +92,6 @@
 		<result column="losing_score" 			property="loseScore"/>
 	</resultMap>
 	
-	
-	<!-- <select id="getItemInfoByName" parameterType="string" resultMap=""></select> -->
 	<select id="findAllMatch" resultMap="MatchResultMap">
 		SELECT
 		    m.*,
@@ -100,25 +100,77 @@
 		    f.file_idx,
 		    fl.file_path,
 		    mt.match_type_nm,
-			mt.total_players, 
+		    mt.total_players, 
 		    min_lvl.tier AS min_level_name, 
 		    max_lvl.tier AS max_level_name,
 		    mt.match_type_nm AS match_method,
 		    match_state.match_stts,
-		    p.`name`
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
 		FROM
 		    matches m
 		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
 		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
 		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
 		    INNER JOIN `fields` f ON m.field_no = f.field_no
-		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
 		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
 		    INNER JOIN files fl ON f.file_idx = fl.file_idx
-		    INNER JOIN stadium st ON f.stadium_no = st.stadium_no
-		    INNER JOIN provinces p ON st.province_id = p.province_id
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
 		WHERE
-		    m.match_stts_no = 1;
+		    m.match_stts_no = 1
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
+	</select>
+	<select id="adminMatchList" resultMap="MatchResultMap">
+		SELECT
+		    m.*,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players, 
+		    min_lvl.tier AS min_level_name, 
+		    max_lvl.tier AS max_level_name,
+		    mt.match_type_nm AS match_method,
+		    match_state.match_stts,
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
+		FROM
+		    matches m
+		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
+		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
+		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
+		    INNER JOIN `fields` f ON m.field_no = f.field_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
+		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
+		    INNER JOIN files fl ON f.file_idx = fl.file_idx
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
 	</select>
 	<select id="stadiumList" resultMap="staListMap">
 		SELECT 
@@ -203,7 +255,11 @@
 			m.match_date = #{date}
 	</select>
 	
-	<insert id="addMatch" parameterType="com.footlink.footlink.user.match.domain.AddMatch">
+	<insert id="addMatch" 
+		parameterType="com.footlink.footlink.user.match.domain.AddMatch"
+        useGeneratedKeys="true" 
+        keyProperty="matchNo" 
+        keyColumn="match_no">
 		INSERT INTO matches
 			(field_no, 
 			match_date, 
@@ -234,7 +290,7 @@
 		INSERT INTO match_applications
 			( match_no, user_id, application_status, applied_at)
 		VALUES 
-			( #{matchNo}, #{userId}, '매치 신청', NOW())
+			( #{application.matchNo}, #{userId}, '매치 신청', NOW())
 	</insert>
 	<select id="getEndList" resultType="com.footlink.footlink.user.match.domain.EndList">
 		 <![CDATA[
@@ -272,6 +328,8 @@
             SELECT
                 m.match_no,
                 m.match_date,
+                m.match_time,
+                m.match_end_time,
                 s.stadium_nm,
                 m.gender_nm,
                 min_lvl.tier AS min_level_name,
