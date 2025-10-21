@@ -23,6 +23,9 @@
 		<result property="pst" column="user_pst" />
 		<result property="level" column="user_level" />
 		<result property="intro" column="user_intro" />
+		<result property="isProfilePublic" column="is_profile_public"/>
+        <result property="isLevelHidden"  column="is_level_hidden"/>
+		
 
 		<!-- ✅ 팀 리스트 매핑 -->
 		<collection property="teams"
@@ -35,6 +38,8 @@
 			<result property="actDow" column="act_dow" />
 			<result property="level" column="level" />
 		</collection>
+		
+		
 	</resultMap>
 
 	<!-- ✅ 이메일 기준으로 내 정보 조회 -->
@@ -60,7 +65,9 @@
 		t.gender,
 		ta.team_age_name AS ageGroup,
 		t.act_dow,
-		l.tier AS level
+		l.tier AS level,
+		u.is_profile_public,
+		u.is_level_hidden
 		FROM user u
 		LEFT JOIN files f ON u.user_img = f.file_idx
 		LEFT JOIN team_user tu ON u.user_id = tu.user_cd
@@ -69,6 +76,7 @@
 		LEFT JOIN levels l ON t.level_cd = l.level_cd
 		WHERE u.user_email = #{email}
 	</select>
+	
 	<update id="modifyMyInfo"
 		parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
 		UPDATE user
@@ -95,6 +103,7 @@
 		WHERE user_email = #{email}
 	</update>
 
+	<!-- 팀 조회 -->
 	<select id="getMyTeamsByEmail" resultType="map">
 		SELECT
 		t.team_cd AS
@@ -125,4 +134,106 @@
 		WHERE
 		u.user_email = #{email}
 	</select>
+	
+	<!-- 신청한 경기 조회 -->
+	
+	<select id="getAppliedMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyAppliedMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.gender_nm,
+	    m.match_type_cd,
+	    l1.tier AS minLevel,
+	    l2.tier AS maxLevel
+	  FROM match_applications a
+	  JOIN matches m ON a.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  LEFT JOIN levels l1 ON m.min_level_cd = l1.level_cd
+	  LEFT JOIN levels l2 ON m.max_level_cd = l2.level_cd
+	  WHERE a.user_id = #{email}
+	</select>
+	
+	<!-- 찜한 경기 조회 -->
+
+	<select id="getLikeMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyLikeMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.gender_nm,
+	    m.match_type_cd,
+	    l1.tier AS minLevel,
+	    l2.tier AS maxLevel
+	  FROM match_likes ml
+	  JOIN matches m ON ml.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  LEFT JOIN levels l1 ON m.min_level_cd = l1.level_cd
+	  LEFT JOIN levels l2 ON m.max_level_cd = l2.level_cd
+	  WHERE ml.user_id = #{email}
+	</select>
+	
+	<!-- 완료한 경기 조회 -->
+	
+	<select id="getCompletedMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyCompletedMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.match_type_cd,
+	    r.home_score,
+	    r.away_score,
+	    r.winner
+	  FROM match_results r
+	  JOIN matches m ON r.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  WHERE m.match_stts_no = 3
+	</select>
+	
+	<!-- 공개설정 조회 -->
+	
+	<select id="getMySettingsByEmail" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  SELECT
+	    u.is_profile_public AS isProfilePublic,
+	    u.is_level_hidden   AS isLevelHidden
+	  FROM user u
+	  WHERE u.user_email = #{email}
+	</select>
+	
+	<!-- 공개설정 업데이트 -->
+	
+	<update id="updateMySettingsByEmail" parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  UPDATE user
+	  <set>
+	    <if test="isProfilePublic != null">
+	      is_profile_public = #{isProfilePublic},
+	    </if>
+	    <if test="isLevelHidden != null">
+	      is_level_hidden = #{isLevelHidden},
+	    </if>
+	  </set>
+	  WHERE user_email = #{email}
+	</update>
+
+	<update id="updatePhone" parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  UPDATE user
+	  SET user_phn_num = #{phone}
+	  WHERE user_email = #{email}
+	</update>
+	
+	<update id="updatePassword">
+	  UPDATE user
+	  SET user_pw = #{password}
+	  WHERE user_email = #{email}
+	</update>	
+		
+	<update id="withdrawUser" parameterType="string">
+	  UPDATE user
+	  SET is_deleted = 1
+	  WHERE user_email = #{email}
+	</update>	
+	
 </mapper>

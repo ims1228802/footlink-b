@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,7 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.footlink.footlink.file.dto.FileDto;
 import com.footlink.footlink.file.mapper.FileMapper;
 import com.footlink.footlink.file.util.FilesUtils;
+import com.footlink.footlink.user.myinfo.domain.MyAppliedMatch;
+import com.footlink.footlink.user.myinfo.domain.MyCompletedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.myinfo.domain.MyLikeMatch;
 import com.footlink.footlink.user.myinfo.mapper.MyInfoMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ public class MyInfoServiceImpl implements MyInfoService {
 	private MyInfoMapper myInfoMapper;
 	private final FileMapper fileMapper;
 	private final FilesUtils filesUtils;
+	private final BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	public MyInfo getMyInfoByEmail(String email) {
@@ -77,4 +82,54 @@ public class MyInfoServiceImpl implements MyInfoService {
 	public List<Map<String, Object>> getMyTeamsByEmail(String email) {
 		return myInfoMapper.getMyTeamsByEmail(email);
 	}
+	
+    @Override
+    @Transactional(readOnly = true)
+    public List<MyAppliedMatch> getAppliedMatches(String email) {
+        return myInfoMapper.getAppliedMatches(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MyLikeMatch> getLikeMatches(String email) {
+        return myInfoMapper.getLikeMatches(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MyCompletedMatch> getCompletedMatches(String email) {
+        return myInfoMapper.getCompletedMatches(email);
+    }
+	
+    @Override
+    @Transactional(readOnly = true)
+    public MyInfo getMySettings(String email) {
+        return myInfoMapper.getMySettingsByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void updateMySettings(MyInfo myInfo) {
+        myInfoMapper.updateMySettingsByEmail(myInfo);
+    }
+    
+    @Override
+    @Transactional
+    public void updatePhone(MyInfo myInfo) {
+        myInfoMapper.updatePhone(myInfo);
+    }
+    
+    @Override
+    @Transactional
+    public void updatePassword(String email, String newPassword) {
+        String encoded = passwordEncoder.encode(newPassword);
+        myInfoMapper.updatePassword(email, encoded);
+    }
+    
+    @Override
+    @Transactional
+    public void withdrawUser(String email) {
+        myInfoMapper.withdrawUser(email);
+    }
+
 }

@@ -14,9 +14,12 @@
 
 	<!-- 특정회원 조회 -->
 	<select id="getUserInfoByEmail" resultMap="userResultMap">
-		SELECT 
-		user_email, user_pw, authrt_cd
-		FROM `user`
-		WHERE user_email = #{email}
+	    SELECT 
+	        user_email, 
+	        user_pw, 
+	        authrt_cd
+	    FROM `user`
+	    WHERE user_email = #{email}
+	      AND (is_deleted IS NULL OR is_deleted = 0)
 	</select>
 </mapper>
