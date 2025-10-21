@@ -23,5 +23,8 @@ public class MyInfo {
     private String level;       // 레벨
     private String intro;       // 자기소개
     private String filePath;
+    private Boolean  isProfilePublic;
+    private Boolean  isLevelHidden;
     private List<MyTeam> teams;
+    
 }
