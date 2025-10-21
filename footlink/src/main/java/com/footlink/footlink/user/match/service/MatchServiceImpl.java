@@ -38,18 +38,15 @@ public class MatchServiceImpl implements MatchService{
 	}
 	@Override
 	public void applyMatch(String matchNo, String userId) {
-        // 1. 먼저 이미 신청 내역이 있는지 확인 (창고 관리인에게 물어봄)
-        int count = matchMapper.countApplicationByUser(matchNo, userId);
 
-        // 2. 신청 내역이 없다면 INSERT 실행 (요리 시작)
+        int count = matchMapper.countApplicationByUser(matchNo, userId);
         if (count == 0) {
             ApplyMatch application = ApplyMatch.builder()
                                         .matchNo(matchNo)
                                         .userId(userId)
                                         .build();
-            matchMapper.insertApplication(application);
+            matchMapper.insertApplication(application,userId);
         } else {
-            // 3. 이미 신청 내역이 있다면 예외를 발생시켜 컨트롤러에게 알림
             throw new IllegalStateException("이미 신청한 매치입니다.");
         }
     }
@@ -141,6 +138,11 @@ public class MatchServiceImpl implements MatchService{
 	public List<EndList> getEndList() {
 		
 		return matchMapper.getEndList();
+	}
+	@Override
+	public List<Match> adminMatchList() {
+		// TODO Auto-generated method stub
+		return matchMapper.adminMatchList();
 	}
 	
 }

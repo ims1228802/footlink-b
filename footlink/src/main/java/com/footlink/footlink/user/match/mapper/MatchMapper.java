@@ -26,6 +26,7 @@ public interface MatchMapper {
 	int addMatch(AddMatch addMatch);
 	List<MatchDetail> getMatchInfo(String matchNo);
 	int countApplicationByUser(@Param("matchNo") String matchNo, @Param("userId") String userId);
-	void insertApplication(ApplyMatch application);
+	void insertApplication(ApplyMatch application, String userId);
 	List<EndList> getEndList();
+	List<Match> adminMatchList();
 }

@@ -9,6 +9,8 @@ import lombok.Data;
 public class EndList {
 	private int matchNo;
     private Date matchDate;
+    private String matchTime;
+    private String matchEndTime;
     private String stadiumNm;
     private String genderNm;
     private String minLevelName;
