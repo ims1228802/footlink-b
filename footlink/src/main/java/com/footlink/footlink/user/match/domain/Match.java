@@ -32,8 +32,10 @@ public class Match {
 	private String minLevelName;
 	private String maxLevelName;
 	private String genderName;
+	private String matchStts;
 	private String matchTypeName;
 	private String region;
 	private int totalPlayers;
+	private int applyCount;
 	
 }

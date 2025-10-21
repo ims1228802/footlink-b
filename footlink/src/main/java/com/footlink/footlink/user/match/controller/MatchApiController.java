@@ -26,6 +26,8 @@ import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.SelectSta;
 import com.footlink.footlink.user.match.domain.Stadium;
 import com.footlink.footlink.user.match.service.MatchService;
+import com.footlink.footlink.user.myinfo.domain.MyInfo;
+import com.footlink.footlink.user.myinfo.service.MyInfoService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,10 +37,13 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "http://localhost:5173")
 public class MatchApiController {
 	private final MatchService matchService;
+	private final MyInfoService myInfoService;
 	
-	public MatchApiController(MatchService matchService) {
+	public MatchApiController(MatchService matchService, MyInfoService myInfoService) {
 		this.matchService = matchService;
+		this.myInfoService = myInfoService;
 	}
+	
 	
 	@PostMapping("/select")
 	public List<Stadium> selectStadium(@RequestBody SelectSta request){
@@ -87,13 +92,15 @@ public class MatchApiController {
     }
 	
 	@PostMapping("/addMatch")
-    public ResponseEntity<?> createMatch(@RequestBody AddMatch addMatch) {
+    public ResponseEntity<?> createMatch(@RequestBody AddMatch addMatch, String userInfo) {
         
-        // ✅ 가장 중요한 확인 부분! 받은 데이터를 로그로 출력합니다.
+ 
         log.info("React로부터 매치 생성 요청을 받았습니다: {}", addMatch.toString());
 
-        matchService.addmatch(addMatch);
-        
+        AddMatch matchdata = matchService.addmatch(addMatch);
+        String matchNo = matchdata.getMatchNo();
+        log.info(matchNo);
+        matchService.applyMatch(matchNo, userInfo);
 
         // 프론트엔드로 보낼 성공 응답
         return ResponseEntity.ok("매치 등록 요청을 성공적으로 받았습니다.");
@@ -110,36 +117,36 @@ public class MatchApiController {
 		return ResponseEntity.ok(response);
 	}
 	@GetMapping("/matchList")
-	public ResponseEntity<Map<String, Object>> getMatchList(){
+	public ResponseEntity<Map<String, Object>> getMatchList(String email){
 		
+		MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
 		List<Match> matchList = matchService.findAllMatch();
 		List<Stadium> staList = matchService.stadiumList();
 		List<Province> proList = matchService.findProvince();
 		
 		Map<String, Object> response = new HashMap<>();
 
-		
+		response.put("myInfo", myInfo);
 		response.put("matchList", matchList);
 		response.put("Sta", staList);
 		response.put("pro", proList);
 		
 		return ResponseEntity.ok(response);
 	}
-	@PostMapping("/apply")
-	public ResponseEntity<?> applyForMatch(@RequestBody ApplyMatch applyMatch, @AuthenticationPrincipal String userId) {
-        try {
-            // "주방장에게 요리를 요청" -> 그냥 서비스 메서드를 호출하기만 합니다.
-            matchService.applyMatch(applyMatch.getMatchNo(), userId);
-            
-            // 성공 시, 200 OK 응답
-            return ResponseEntity.ok("매치 신청이 성공적으로 완료되었습니다.");
+	@PostMapping("/apply/{matchNo}/{email}")
+	public ResponseEntity<?> applyForMatch(@PathVariable String matchNo, @PathVariable String email) {
+	    try {
+	        MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
+	        String userId = myInfo.getId(); 
+	        
+	        matchService.applyMatch(matchNo, userId);
+	        
+	        return ResponseEntity.ok("매치 신청이 성공적으로 완료되었습니다.");
 
-        } catch (IllegalStateException e) {
-            // 서비스에서 "이미 신청한 매치" 예외가 발생하면, 409 Conflict 응답
-            // 409 Conflict는 요청이 서버의 현재 상태와 충돌될 때 사용하는 상태 코드입니다. (예: 중복 데이터 생성)
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-    }
+	    } catch (IllegalStateException e) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+	    }
+	}
 	@GetMapping("/endList")
 	public ResponseEntity<Map<String, Object>> getEndList(){
 		
@@ -155,6 +162,30 @@ public class MatchApiController {
 		
 		log.info("리액트로 보낸 매치 결과" + endList);
 		return ResponseEntity.ok(response);
-	} 
+	}
+	@GetMapping("/result/{matchNo}")
+	public ResponseEntity<Map<String, Object>> getMatchResult(){
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		return ResponseEntity.ok(response);
+	}
+	@GetMapping("/admin")
+	public ResponseEntity<Map<String, Object>> adminMatchList(String email){
+		
+		MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
+		List<Match> matchList = matchService.adminMatchList();
+		List<Stadium> staList = matchService.stadiumList();
+		List<Province> proList = matchService.findProvince();
+		
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("myInfo", myInfo);
+		response.put("matchList", matchList);
+		response.put("Sta", staList);
+		response.put("pro", proList);
+		
+		return ResponseEntity.ok(response);
+	}
 	
 }
