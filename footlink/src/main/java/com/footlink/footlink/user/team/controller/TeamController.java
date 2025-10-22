@@ -201,6 +201,119 @@ public class TeamController {
 		
 		return ResponseEntity.ok("팀 등록 성공");
 	}
+	// 팀 수정하기
+	@PutMapping("/team/editTeam")
+	public ResponseEntity<String> editTeam(@RequestBody Map<String, Object> team){
+		
+		// State 객체 새로 생성
+		State state = new State();
+		// Team 객체 새로 생성
+		Team teamDTO = new Team();
+		
+		String[] weekStrArr = {"일","월","화","수","목","금","토"};
+		
+		// state 수치 가져오기
+		String teamCode = team.get("teamCode").toString();
+		String teamName = team.get("teamName").toString();
+		String region = team.get("area").toString() + " " + team.get("city").toString();
+		String gender = team.get("gender").toString();
+		String meetingTime = team.get("activeTime").toString();
+		String teamAge = team.get("age").toString();
+		String level = team.get("level").toString();
+		String stadium = team.get("stadium").toString();
+		String userId = team.get("userId").toString();
+		
+		// 대괄호 제거 후 쉼표로 자르기
+		String[] weekRepleace = team.get("week").toString().replaceAll("[\\[\\]]", "").split(", ");
+		
+		if(weekRepleace.length == 7) {
+			weekStr = "매일";
+		}else {
+			IntStream.range(0, weekRepleace.length).forEach(idx -> {
+				if(idx == weekRepleace.length - 1) {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]);
+				}else {
+					weekStr = weekStr.concat(weekStrArr[Integer.parseInt(weekRepleace[idx])]).concat(",");				
+				}
+			});
+		}
+		
+		log.info("week: {}", weekStr);
+		
+		int attack = Integer.parseInt(team.get("attack").toString());
+		int defense = Integer.parseInt(team.get("defense").toString());
+		int dribble = Integer.parseInt(team.get("dribble").toString());
+		int pass = Integer.parseInt(team.get("pass").toString());
+		int physical = Integer.parseInt(team.get("physical").toString());
+		int shot = Integer.parseInt(team.get("shot").toString());
+		int speed = Integer.parseInt(team.get("speed").toString());
+		int stamina = Integer.parseInt(team.get("stamina").toString());
+		
+		//state 객체에 set
+		state.setTeamCode(teamCode);
+		state.setAttack(attack);
+		state.setDefense(defense);
+		state.setDribble(dribble);
+		state.setPass(pass);
+		state.setPhysical(physical);
+		state.setShot(shot);
+		state.setSpeed(speed);
+		state.setStamina(stamina);
+		
+		//team 객체에 set
+		teamDTO.setTeamCode(teamCode);
+		teamDTO.setTeamName(teamName);
+		teamDTO.setRegionName(region);
+		teamDTO.setActiveDoWeek(weekStr);
+		teamDTO.setTeamAge(teamAge);
+		teamDTO.setLevel(level);
+		teamDTO.setStadium(stadium);
+		
+		// 성별
+		switch(gender) {
+		case "man":
+			teamDTO.setGender("남자");
+			break;
+		case "woman":
+			teamDTO.setGender("여자");
+			break;
+		default:
+			teamDTO.setGender("남녀모두");
+			break;
+		}
+		
+		// 활동 시간
+		switch (meetingTime) {
+		case "morning":
+			teamDTO.setMeetingTime("아침");
+			break;
+		case "lunch":
+			teamDTO.setMeetingTime("점심");
+			break;
+		case "dinner":
+			teamDTO.setMeetingTime("저녁");
+			break;
+		case "lateNight":
+			teamDTO.setMeetingTime("심야");
+			break;
+		}
+		
+		// 연령대
+		teamDTO.setIsTemp("정석");
+		
+		//log 출력
+		log.info("team: {}", team);
+		log.info("teamDTO: {}", teamDTO);
+		log.info("state: {}", state);
+		
+		// 각각 state 테이블과 team 테이블 데이터 수정 
+		teamService.editTeamInfo(teamDTO);
+		teamService.editTeamState(state);
+		
+		weekStr = "";
+		
+		return ResponseEntity.ok("팀 수정 성공");
+	}
 	
 	// 팀 삭제하기
 	@PutMapping("/team/deleteTeam")

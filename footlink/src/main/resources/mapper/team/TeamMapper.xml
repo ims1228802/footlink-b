@@ -224,6 +224,23 @@
 			);
 	</insert>
 	
+	<update id="editTeamState" parameterType="com.footlink.footlink.user.team.domain.State">
+		update team_state
+		<set>
+			attack = #{attack}, 
+			speed = #{speed}, 
+			dribble = #{dribble}, 
+			stamina = #{stamina}, 
+			defense = #{defense}, 
+			physical= #{physical}, 
+			pass = #{pass}, 
+			shot = #{shot}
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
+	
 	<insert id="addTeamUser" parameterType="Map">
 		INSERT INTO team_user(
 				team_cd, 
@@ -306,6 +323,23 @@
 			#{teamDistinction}
 			);
 	</insert>
+	
+	<update id="editTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
+		UPDATE team
+		<set>
+			team_nm = #{teamName},
+			rgn_nm = #{regionName},
+			mtn_tm = (SELECT mt.mtn_tm_cd FROM meeting_times mt WHERE mt.mtn_tm_nm = #{meetingTime}), 
+			team_age = (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{teamAge}, '%')), 
+			level_cd = (SELECT l.level_cd FROM levels l WHERE l.tier = #{level}),
+			stadium = (SELECT s.stadium_no FROM stadium s WHERE s.stadium_nm = #{stadium}), 
+			gender = #{gender}, 
+			act_dow = #{activeDoWeek}
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
 	
 	<update id="deleteTeam" parameterType="String">
 		UPDATE team

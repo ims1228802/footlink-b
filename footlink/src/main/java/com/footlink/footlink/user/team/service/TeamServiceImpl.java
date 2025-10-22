@@ -105,5 +105,15 @@ public class TeamServiceImpl implements TeamService{
 		
 		teamMapper.deleteTeamUser(userInfo);
 	}
+
+	@Override
+	public void editTeamInfo(Team param) {
+		teamMapper.editTeamInfo(param);
+	}
+
+	@Override
+	public void editTeamState(State param) {
+		teamMapper.editTeamState(param);
+	}
 	
 }

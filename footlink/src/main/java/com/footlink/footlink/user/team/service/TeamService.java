@@ -18,9 +18,11 @@ public interface TeamService {
 	State getTeamState(String teamCode);				// 팀 스텟 조회
 	List<Calendar> getTeamCalendar(String teamCode);	// 팀 일정 조회
 	void addTeamInfo(Team param);						// 팀 등록
+	void editTeamInfo(Team param);						// 팀 수정
 	void deleteTeam(String teamCode);					// 팀 삭제(소프트 삭제)
 	void deleteTeamUser(String teamCode, String id);	// 팀 유저 탈퇴(하드 삭제)
 	void addTeamState(State param);						// 팀 능력치 등록
+	void editTeamState(State param);					// 팀 능력치 수정
 	void addTeamUser(String teamCode, String userId);	// 팀 유저 등록
 	void addCalendar(Calendar calendar);				// 일정 등록
 	void addTeamRecruit(Recruit recruit);				// 팀 모집글 등록
