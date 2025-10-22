@@ -35,7 +35,8 @@
 			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
 			s.stadium_nm,
 			t.gender,
-			t.act_dow
+			t.act_dow,
+			t.is_deleted
 		FROM
 			team t
 		LEFT JOIN meeting_times m
@@ -45,7 +46,9 @@
 		LEFT JOIN levels l
 		ON t.level_cd = l.level_cd
 		LEFT JOIN stadium s
-		ON t.stadium = s.stadium_no;
+		ON t.stadium = s.stadium_no
+		WHERE
+		 t.is_deleted = 0;
 	</select>
 	
 	<select id="getSearchTeamList" resultMap="TeamList" parameterType="String">
@@ -116,18 +119,24 @@
 		ON t.level_cd = l.level_cd
 		LEFT JOIN stadium s
 		ON t.stadium = s.stadium_no
-		WHERE t.team_cd = #{teamCode};
+		WHERE 
+			t.team_cd = #{teamCode};
 	</select>
 	
-	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.team.domain.TeamUser">
 		SELECT
+			u.user_id as userId,
 			u.user_nm as name,
-			u.user_level as level
+			u.user_level as level,
+			ta.team_authrt_nm as teamAuthrtName
 		FROM
 		`user` u
 		LEFT JOIN team_user tu
 		ON u.user_id = tu.user_cd
-		WHERE tu.team_cd = #{teamCode};
+		LEFT JOIN team_authrt ta
+		ON tu.team_auhrt_cd = ta.team_authrt_cd
+		WHERE 
+			tu.team_cd = #{teamCode};
 	</select>
 	
 	<select id="getTeamState" resultType="com.footlink.footlink.user.team.domain.State" parameterType="String">
@@ -142,7 +151,8 @@
 			ts.shot
 		FROM
 			team_state ts
-		WHERE team_cd = #{teamCode};
+		WHERE 
+			team_cd = #{teamCode};
 	</select>
 	
 	<select id="getTeamCalendar" resultType="com.footlink.footlink.user.team.domain.Calendar" parameterType="String">
@@ -214,14 +224,33 @@
 			);
 	</insert>
 	
+	<update id="editTeamState" parameterType="com.footlink.footlink.user.team.domain.State">
+		update team_state
+		<set>
+			attack = #{attack}, 
+			speed = #{speed}, 
+			dribble = #{dribble}, 
+			stamina = #{stamina}, 
+			defense = #{defense}, 
+			physical= #{physical}, 
+			pass = #{pass}, 
+			shot = #{shot}
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
+	
 	<insert id="addTeamUser" parameterType="Map">
 		INSERT INTO team_user(
 				team_cd, 
-				user_cd
+				user_cd,
+				team_auhrt_cd
 			)
 		VALUES (
 				#{teamCode}, 
-				#{userId}
+				#{userId},
+				'team_atrt_01'
 			);
 	</insert>
 	
@@ -295,4 +324,38 @@
 			);
 	</insert>
 	
+	<update id="editTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
+		UPDATE team
+		<set>
+			team_nm = #{teamName},
+			rgn_nm = #{regionName},
+			mtn_tm = (SELECT mt.mtn_tm_cd FROM meeting_times mt WHERE mt.mtn_tm_nm = #{meetingTime}), 
+			team_age = (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{teamAge}, '%')), 
+			level_cd = (SELECT l.level_cd FROM levels l WHERE l.tier = #{level}),
+			stadium = (SELECT s.stadium_no FROM stadium s WHERE s.stadium_nm = #{stadium}), 
+			gender = #{gender}, 
+			act_dow = #{activeDoWeek}
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
+	
+	<update id="deleteTeam" parameterType="String">
+		UPDATE team
+		<set>
+			is_deleted = 1
+		</set>
+		<where>
+			team_cd = #{teamCode}
+		</where>
+	</update>
+	
+	<delete id="deleteTeamUser" parameterType="Map">
+		DELETE FROM team_user
+		WHERE
+			user_cd = #{userId}
+		AND
+			team_cd = #{teamCode}
+	</delete>
 </mapper>
