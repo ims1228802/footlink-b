@@ -7,6 +7,7 @@ import com.footlink.footlink.user.match.domain.EndList;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Match;
 import com.footlink.footlink.user.match.domain.MatchDetail;
+import com.footlink.footlink.user.match.domain.Player;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 
@@ -18,8 +19,12 @@ public interface MatchService {
 	List<Field> getfieldList(String staNo);
 	List<Match> getBookList(String fieldNo, String date);
 	AddMatch addmatch(AddMatch addMatch);
-	List<MatchDetail> getMatchInfo(String matchNo);
+	MatchDetail getMatchInfo(String matchNo);
 	void applyMatch(String matchNo, String userId);
 	List<EndList> getEndList();
 	List<Match> adminMatchList();
+	void addLike(String matchNo, String userId);
+	void removeLike(String matchNo, String userId);
+	boolean isLikedByUser(String matchNo, String userId);
+	List<Player> getPlayerList(String matchNo);
 }

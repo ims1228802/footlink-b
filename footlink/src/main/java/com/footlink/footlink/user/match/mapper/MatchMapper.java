@@ -11,6 +11,7 @@ import com.footlink.footlink.user.match.domain.EndList;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Match;
 import com.footlink.footlink.user.match.domain.MatchDetail;
+import com.footlink.footlink.user.match.domain.Player;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 
@@ -24,9 +25,14 @@ public interface MatchMapper {
 	List<Field> getfieldList(String staNo);
 	List<Match> getbookList(String fieldNo, String date);
 	int addMatch(AddMatch addMatch);
-	List<MatchDetail> getMatchInfo(String matchNo);
+	MatchDetail getMatchInfo(String matchNo);
 	int countApplicationByUser(@Param("matchNo") String matchNo, @Param("userId") String userId);
-	void insertApplication(ApplyMatch application, String userId);
+	void insertApplication(ApplyMatch application);
 	List<EndList> getEndList();
 	List<Match> adminMatchList();
+	void updateMatchStts(String matchNo);
+	void addLike(String matchNo, String userId);
+	void removeLike(String matchNo, String userId);
+	boolean isLikedByUser(String matchNo, String userId);
+	List<Player> getPlayerList(String matchNo);
 }

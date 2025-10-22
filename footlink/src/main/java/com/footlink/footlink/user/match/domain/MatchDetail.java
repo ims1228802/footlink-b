@@ -43,5 +43,6 @@ public class MatchDetail {
 	private String vestRtYn;		//조끼 대여 유무
 	private String ballRtYn;		//풋살공 대여 유무
 	private String sellDrink;		//음료 판매 유무
-	
+	private int applyCount;
+	private Boolean isLikedByUser;
 }

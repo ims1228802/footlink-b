@@ -1,0 +1,99 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.footlink.footlink.user.match.mapper.MatchResultMapper">
+
+    <delete id="deleteMatchParticipantsState" parameterType="long">
+        DELETE FROM match_participants_statas WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchResults" parameterType="long">
+        DELETE FROM match_results WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchFinalResults" parameterType="long">
+        DELETE FROM match_final_results WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchParticipants" parameterType="long">
+        DELETE FROM match_participants WHERE match_no = #{matchNo}
+    </delete>
+
+
+    <insert id="insertMatchParticipantsStateList" parameterType="list">
+        INSERT INTO match_participants_statas
+            (match_no, game_number, user_id, team_cd, goal, assist, saves)
+        VALUES
+        <foreach collection="list" item="state" separator=",">
+            (
+                #{state.matchNo}, 
+                #{state.gameNumber}, 
+                #{state.userId}, 
+                #{state.teamCd}, 
+                #{state.goal}, 
+                #{state.assist}, 
+                #{state.saves}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertMatchResultList" parameterType="list">
+        INSERT INTO match_results
+            (match_no, game_number, team_a_cd, team_a_score, team_b_cd, team_b_score, winner_team_cd, loser_team_cd)
+        VALUES
+        <foreach collection="list" item="result" separator=",">
+            (
+                #{result.matchNo},
+                #{result.gameNumber},
+                #{result.teamACd},
+                #{result.teamAScore},
+                #{result.teamBCd},
+                #{result.teamBScore},
+                #{result.winnerTeamCd},
+                #{result.loserTeamCd}
+            )
+        </foreach>
+    </insert>
+    
+    <insert id="insertMatchFinalResultList" parameterType="list">
+        INSERT INTO match_final_results
+            (match_no, team_cd, wins, draws, losses, goals_for, goals_against, goal_difference)
+        VALUES
+        <foreach collection="list" item="final" separator=",">
+            (
+                #{final.matchNo},
+                #{final.teamCd},
+                #{final.wins},
+                #{final.draws},
+                #{final.losses},
+                #{final.goalsFor},
+                #{final.goalsAgainst},
+                #{final.goalDifference}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertMatchParticipantList" parameterType="list">
+        INSERT INTO match_participants
+            (match_no, user_id, team_cd)
+        VALUES
+        <foreach collection="list" item="p" separator=",">
+            (
+                #{p.matchNo},
+                #{p.userId},
+                #{p.teamCd}
+            )
+        </foreach>
+    </insert>
+    <update id="updateMatchStatusToCompleted">
+        UPDATE `matches`
+        SET
+            match_stts_no = #{toStatus}
+        WHERE
+            match_no = #{matchNo}
+            AND 
+            match_stts_no = #{fromStatus}
+    </update>
+
+</mapper>
+    
