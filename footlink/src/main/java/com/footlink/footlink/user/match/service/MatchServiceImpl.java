@@ -11,6 +11,7 @@ import com.footlink.footlink.user.match.domain.EndList;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Match;
 import com.footlink.footlink.user.match.domain.MatchDetail;
+import com.footlink.footlink.user.match.domain.Player;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.Stadium;
 import com.footlink.footlink.user.match.mapper.MatchMapper;
@@ -37,18 +38,34 @@ public class MatchServiceImpl implements MatchService{
 		return matchMapper.getfieldList(staNO);
 	}
 	@Override
+	@Transactional
 	public void applyMatch(String matchNo, String userId) {
+		int count = matchMapper.countApplicationByUser(matchNo, userId);
+		
+		if (count > 0) { 
+			throw new IllegalStateException("이미 신청한 매치입니다.");
+		}
 
-        int count = matchMapper.countApplicationByUser(matchNo, userId);
-        if (count == 0) {
-            ApplyMatch application = ApplyMatch.builder()
-                                        .matchNo(matchNo)
-                                        .userId(userId)
-                                        .build();
-            matchMapper.insertApplication(application,userId);
-        } else {
-            throw new IllegalStateException("이미 신청한 매치입니다.");
-        }
+        // 신청 로직
+		ApplyMatch application = ApplyMatch.builder()
+				.matchNo(matchNo)
+				.userId(userId)
+				.build();
+        // 4. (개선) 중복 파라미터 제거
+		matchMapper.insertApplication(application); 
+		
+	
+        // 마감 확인 로직
+		MatchDetail matchInfo = (MatchDetail) matchMapper.getMatchInfo(matchNo);
+		int totalPlayers = matchInfo.getTotalPlayers();
+		int applyPlayers = matchInfo.getApplyCount();
+			
+        // 5. (치명적 오류 수정) !=  -> ==
+		if (totalPlayers == applyPlayers) { 
+            // 6. (권장) 메서드 이름 명확화 (예: updateMatchStatusToClosed)
+			matchMapper.updateMatchStts(matchNo); 
+		}
+		
     }
 	@Override
 	public List<Stadium> stadiumList() {
@@ -62,7 +79,7 @@ public class MatchServiceImpl implements MatchService{
 		return matchMapper.findProvince();
 	}
 	@Override
-	public List<MatchDetail> getMatchInfo(String matchNo) {
+	public MatchDetail getMatchInfo(String matchNo) {
 		
 		return matchMapper.getMatchInfo(matchNo);
 	}
@@ -141,8 +158,24 @@ public class MatchServiceImpl implements MatchService{
 	}
 	@Override
 	public List<Match> adminMatchList() {
-		// TODO Auto-generated method stub
+
 		return matchMapper.adminMatchList();
 	}
-	
+	@Override
+	public void addLike(String matchNo, String userId) {
+		matchMapper.addLike(matchNo, userId);
+	}
+	@Override
+	public void removeLike(String matchNo, String userId) {
+		matchMapper.removeLike(matchNo, userId);
+	}
+	@Override
+	public boolean isLikedByUser(String matchNo, String userId) {
+		return matchMapper.isLikedByUser(matchNo, userId);
+	}
+	@Override
+	public List<Player> getPlayerList(String matchNo) {
+		
+		return matchMapper.getPlayerList(matchNo);
+	}
 }

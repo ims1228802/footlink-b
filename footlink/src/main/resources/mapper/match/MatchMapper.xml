@@ -43,6 +43,14 @@
 			<result column="has_vest_rental" 		property="vestRtYn" />
 			<result column="has_ball_rental"  		property="ballRtYn" />
 			<result column="sells_drinks"  			property="sellDrink" />
+			<result column="application_count" 	property="applyCount" />
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.Player" id="playerMap">
+		<id column="application_no"/>
+		<result column="user_nm" 	property="userName"/>
+		<result column="user_id"	property="userId"/>
+		<result column="team_names"	property="teamName"/>
+		<result column="team_codes"	property="teamCode"/>
 	</resultMap>
 	<resultMap type="com.footlink.footlink.user.match.domain.Stadium" id="staListMap">
 			<id column="stadium_no" 				property="staNo"/>
@@ -120,6 +128,8 @@
 		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
 		WHERE
 		    m.match_stts_no = 1
+		    OR
+		    m.match_stts_no = 2
 		GROUP BY 
 		    m.match_no,
 		    s.stadium_nm,
@@ -191,34 +201,53 @@
 		FROM 
 			stadium;
 	</select>
-	
+	<insert id="addLike">
+		INSERT INTO match_likes
+			( match_no, user_id, liked_at)
+		VALUES 
+			(#{matchNo}, #{userId}, NOW())
+	</insert>
 	<select id="getMatchInfo" resultMap="MatchDetailMap">
 		SELECT
 		    m.*,
 		    s.*,
-		    f.*,
+		    f.field_nm,
+		    f.file_idx,
+		    f.spcffct,
 		    fl.file_path,
 		    mt.match_type_nm,
-			 mt.total_players, 
+		    mt.total_players, 
 		    min_lvl.tier AS min_level_name, 
 		    max_lvl.tier AS max_level_name,
 		    mt.match_type_nm AS match_method,
 		    match_state.match_stts,
-		    p.`name`
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
 		FROM
 		    matches m
 		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
 		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
 		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
 		    INNER JOIN `fields` f ON m.field_no = f.field_no
-		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
 		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
 		    INNER JOIN files fl ON f.file_idx = fl.file_idx
-		    INNER JOIN stadium st ON f.stadium_no = st.stadium_no
-		    INNER JOIN provinces p ON st.province_id = p.province_id
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
 		WHERE
-		    m.match_no = 1;
-
+		    m.match_no = #{matchNo}
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
 	</select>
 	<select id="findByKeyword" resultMap="staListMap">
 		SELECT 
@@ -254,6 +283,13 @@
 			and
 			m.match_date = #{date}
 	</select>
+	<update id="updateMatchStts">
+		UPDATE matches
+			SET
+				match_stts_no=2
+			WHERE
+				match_no = #{matchNo}
+	</update>
 	
 	<insert id="addMatch" 
 		parameterType="com.footlink.footlink.user.match.domain.AddMatch"
@@ -290,7 +326,7 @@
 		INSERT INTO match_applications
 			( match_no, user_id, application_status, applied_at)
 		VALUES 
-			( #{application.matchNo}, #{userId}, '매치 신청', NOW())
+			( #{matchNo}, #{userId}, '매치 신청', NOW())
 	</insert>
 	<select id="getEndList" resultType="com.footlink.footlink.user.match.domain.EndList">
 		 <![CDATA[
@@ -353,6 +389,44 @@
             ORDER BY
                 m.match_date DESC
         ]]>
+	</select>
+	<select id="isLikedByUser">
+		SELECT 
+			COUNT(*)
+		FROM 
+			match_likes
+		WHERE
+			match_no=#{matchNo}
+			and
+			user_id=#{userId}
+	</select>
+	<delete id="removeLike">
+		DELETE 
+		FROM 
+			match_likes 
+		WHERE 
+			match_no = #{matchNo} 
+			AND 
+			user_id = #{userId}
+	</delete>
+	<select id="getPlayerList" resultMap="playerMap">
+		SELECT
+		    u.user_id,
+		    u.user_nm,
+		    GROUP_CONCAT(t.team_cd SEPARATOR ', ') AS team_codes, 
+		    GROUP_CONCAT(t.team_nm SEPARATOR ', ') AS team_names
+		FROM
+		    match_applications ma
+		LEFT JOIN
+		    `user` u ON ma.user_id = u.user_id
+		LEFT JOIN
+		    team_user tu ON u.user_id = tu.user_cd
+		LEFT JOIN
+		    team t ON tu.team_cd = t.team_cd
+		WHERE
+		    ma.match_no = #{matchNo}
+		GROUP BY
+		    u.user_id, u.user_nm;
 	</select>
     
 </mapper>

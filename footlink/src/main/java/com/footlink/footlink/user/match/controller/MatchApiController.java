@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.footlink.footlink.user.match.domain.AddMatch;
-import com.footlink.footlink.user.match.domain.ApplyMatch;
 import com.footlink.footlink.user.match.domain.EndList;
 import com.footlink.footlink.user.match.domain.Field;
 import com.footlink.footlink.user.match.domain.Match;
 import com.footlink.footlink.user.match.domain.MatchDetail;
+import com.footlink.footlink.user.match.domain.Player;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.SelectSta;
 import com.footlink.footlink.user.match.domain.Stadium;
+import com.footlink.footlink.user.match.domain.ResultDTO.ResultDataDto;
+import com.footlink.footlink.user.match.service.MatchResultService;
 import com.footlink.footlink.user.match.service.MatchService;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.myinfo.service.MyInfoService;
@@ -38,10 +40,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MatchApiController {
 	private final MatchService matchService;
 	private final MyInfoService myInfoService;
+	private final MatchResultService matchResultService;
 	
-	public MatchApiController(MatchService matchService, MyInfoService myInfoService) {
+	public MatchApiController(MatchService matchService, MyInfoService myInfoService,MatchResultService matchResultService) {
 		this.matchService = matchService;
 		this.myInfoService = myInfoService;
+		this.matchResultService = matchResultService;
 	}
 	
 	
@@ -56,12 +60,18 @@ public class MatchApiController {
 		return results;
 	}
 	@GetMapping("/{matchNo}")
-	public ResponseEntity<MatchDetail> getMatchInfo(@PathVariable("matchNo") String matchNo) {
-		List<MatchDetail> matchInfoList = matchService.getMatchInfo(matchNo);
-		
-		 MatchDetail matchInfo = matchInfoList.get(0);
-		 
-		 log.info("리액트로 반환한 데이터" + matchInfo);
+	public ResponseEntity<MatchDetail> getMatchInfo(@PathVariable("matchNo") String matchNo,
+													@RequestParam(name = "email", required = false) String email) {
+		MatchDetail matchInfo = matchService.getMatchInfo(matchNo);
+		MyInfo userInfo = myInfoService.getMyInfoByEmail(email);
+		boolean isLikedByUser = false;
+		if (email != null) {
+	        String userId = userInfo.getId();
+	        
+	        isLikedByUser = matchService.isLikedByUser(matchNo, userId); 
+	        log.info("검색 결과" + isLikedByUser);
+	    }
+		matchInfo.setIsLikedByUser(isLikedByUser);
 		
 		return ResponseEntity.ok(matchInfo);
 	}
@@ -187,5 +197,52 @@ public class MatchApiController {
 		
 		return ResponseEntity.ok(response);
 	}
+	@PostMapping("/like/{matchNo}/{email}")
+    public ResponseEntity<?> addLike(
+            @PathVariable("matchNo") String matchNo,
+            @PathVariable("email") String email) {
+        
+		 MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
+	     String userId = myInfo.getId(); 
+	     matchService.addLike(matchNo, userId);
+
+        
+        return ResponseEntity.ok().build(); 
+    }
+
+    @DeleteMapping("/like/{matchNo}/{email}")
+    public ResponseEntity<?> removeLike(
+            @PathVariable("matchNo") String matchNo,
+            @PathVariable("email") String email) {
+    	 MyInfo myInfo = myInfoService.getMyInfoByEmail(email);
+	     String userId = myInfo.getId(); 
+	     matchService.removeLike(matchNo, userId);
+
+        
+        return ResponseEntity.ok().build(); 
+    }
+    @GetMapping("/playerList/{matchNo}")
+    public ResponseEntity<Map<String, Object>> getPlayerList(@PathVariable("matchNo") String matchNo) {
+    	
+    	List<Player> playerList = matchService.getPlayerList(matchNo);
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("player", playerList);
+    	
+    	return ResponseEntity.ok(response);
+    }
+    @PostMapping("save-results")
+	public ResponseEntity<?> saveMatchResults(@RequestBody ResultDataDto resultDataDto) {
+	        
+	        
+	        try {
+	            matchResultService.saveMatchResults(resultDataDto);
+	            
+	            return ResponseEntity.ok().body("매치 결과가 성공적으로 저장되었습니다.");
 	
+	        } catch (Exception e) {
+	            e.printStackTrace(); 
+	            return ResponseEntity.internalServerError().body("결과 저장 중 오류 발생: " + e.getMessage());
+	        }
+    }
 }
