@@ -123,14 +123,18 @@
 			t.team_cd = #{teamCode};
 	</select>
 	
-	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.team.domain.TeamUser">
 		SELECT
+			u.user_id as userId,
 			u.user_nm as name,
-			u.user_level as level
+			u.user_level as level,
+			ta.team_authrt_nm as teamAuthrtName
 		FROM
 		`user` u
 		LEFT JOIN team_user tu
 		ON u.user_id = tu.user_cd
+		LEFT JOIN team_authrt ta
+		ON tu.team_auhrt_cd = ta.team_authrt_cd
 		WHERE 
 			tu.team_cd = #{teamCode};
 	</select>
@@ -223,11 +227,13 @@
 	<insert id="addTeamUser" parameterType="Map">
 		INSERT INTO team_user(
 				team_cd, 
-				user_cd
+				user_cd,
+				team_auhrt_cd
 			)
 		VALUES (
 				#{teamCode}, 
-				#{userId}
+				#{userId},
+				'team_atrt_01'
 			);
 	</insert>
 	
