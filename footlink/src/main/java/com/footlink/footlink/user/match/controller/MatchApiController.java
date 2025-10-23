@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,9 @@ import com.footlink.footlink.user.match.domain.Player;
 import com.footlink.footlink.user.match.domain.Province;
 import com.footlink.footlink.user.match.domain.SelectSta;
 import com.footlink.footlink.user.match.domain.Stadium;
+import com.footlink.footlink.user.match.domain.ResultDTO.GameRe;
+import com.footlink.footlink.user.match.domain.ResultDTO.MatchParticipant;
+import com.footlink.footlink.user.match.domain.ResultDTO.MatchSummaryDto;
 import com.footlink.footlink.user.match.domain.ResultDTO.ResultDataDto;
 import com.footlink.footlink.user.match.service.MatchResultService;
 import com.footlink.footlink.user.match.service.MatchService;
@@ -245,4 +249,67 @@ public class MatchApiController {
 	            return ResponseEntity.internalServerError().body("결과 저장 중 오류 발생: " + e.getMessage());
 	        }
     }
+    @GetMapping("/partiList/{matchNo}")
+    public ResponseEntity<Map<String, Object>> getPartiList(@PathVariable("matchNo") Long matchNo) {
+    	
+    	List<MatchParticipant> partiList = matchResultService.selectMatchParticipantList(matchNo);
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("partiList", partiList);
+    	
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/endMatch/{matchNo}")
+    public ResponseEntity<Map<String, Object>> getEndMatchInfo(@PathVariable("matchNo") Long matchNo) {
+    	
+    	List<GameRe> EndMatchInfo = matchResultService.getMatchResultsForEdit(matchNo);
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	response.put("EndMatchInfo", EndMatchInfo);
+    	
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/update-results")
+    public ResponseEntity<?> updateMatchResults(@RequestBody ResultDataDto resultDataDto) {
+        try {
+            matchResultService.saveMatchResults(resultDataDto);
+            return ResponseEntity.ok().body("매치 결과가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("결과 수정 중 오류 발생: " + e.getMessage());
+        }
+    }
+    @GetMapping("/{matchNo}/summary")
+    public ResponseEntity<?> getMatchSummary(@PathVariable("matchNo") Long matchNo) {
+        try {
+            MatchSummaryDto summary = matchResultService.getMatchSummary(matchNo);
+            if (summary == null) {
+                // 매치 정보가 없으면 404 Not Found 또는 빈 객체 반환
+                return ResponseEntity.notFound().build();
+            }
+            // 성공 시 요약 DTO 반환 (HTTP 200 OK)
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            log.error("매치 요약 정보 조회 오류 (matchNo {}): {}", matchNo, e.getMessage());
+            return ResponseEntity.internalServerError().body("매치 요약 정보 조회 중 오류 발생");
+        }
+    }
+    @GetMapping("/{matchNo}/details")
+    public ResponseEntity<?> getMatchDetails(@PathVariable("matchNo") Long matchNo) {
+        try {
+            // 수정 페이지를 위해 설계했던 서비스 메서드 재사용
+            List<GameRe> gameDetails = matchResultService.getMatchResultsForEdit(matchNo); // 또는 서비스 메서드 이름 변경
+
+            // React의 기대 구조(response.data.games)에 맞게 List를 Map으로 감싸기
+            Map<String, Object> response = new HashMap<>();
+            response.put("games", gameDetails); // 키는 "games"
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("매치 상세 정보 조회 오류 (matchNo {}): {}", matchNo, e.getMessage());
+            return ResponseEntity.internalServerError().body("매치 상세 정보 조회 중 오류 발생");
+        }
+    }
+    
+    
 }
