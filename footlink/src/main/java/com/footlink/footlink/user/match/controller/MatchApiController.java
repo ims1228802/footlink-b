@@ -284,10 +284,8 @@ public class MatchApiController {
         try {
             MatchSummaryDto summary = matchResultService.getMatchSummary(matchNo);
             if (summary == null) {
-                // 매치 정보가 없으면 404 Not Found 또는 빈 객체 반환
                 return ResponseEntity.notFound().build();
             }
-            // 성공 시 요약 DTO 반환 (HTTP 200 OK)
             return ResponseEntity.ok(summary);
         } catch (Exception e) {
             log.error("매치 요약 정보 조회 오류 (matchNo {}): {}", matchNo, e.getMessage());
@@ -297,12 +295,10 @@ public class MatchApiController {
     @GetMapping("/{matchNo}/details")
     public ResponseEntity<?> getMatchDetails(@PathVariable("matchNo") Long matchNo) {
         try {
-            // 수정 페이지를 위해 설계했던 서비스 메서드 재사용
-            List<GameRe> gameDetails = matchResultService.getMatchResultsForEdit(matchNo); // 또는 서비스 메서드 이름 변경
 
-            // React의 기대 구조(response.data.games)에 맞게 List를 Map으로 감싸기
+            List<GameRe> gameDetails = matchResultService.getMatchResultsForEdit(matchNo); 
             Map<String, Object> response = new HashMap<>();
-            response.put("games", gameDetails); // 키는 "games"
+            response.put("games", gameDetails);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
