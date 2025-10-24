@@ -15,8 +15,10 @@ import com.footlink.footlink.user.match.domain.ResultDTO.MatchFinalResult;
 import com.footlink.footlink.user.match.domain.ResultDTO.MatchParticipant;
 import com.footlink.footlink.user.match.domain.ResultDTO.MatchParticipantState;
 import com.footlink.footlink.user.match.domain.ResultDTO.MatchResult;
+import com.footlink.footlink.user.match.domain.ResultDTO.MatchSummaryDto;
 import com.footlink.footlink.user.match.domain.ResultDTO.PlayerRe;
 import com.footlink.footlink.user.match.domain.ResultDTO.ResultDataDto;
+import com.footlink.footlink.user.match.domain.ResultDTO.TeamSummaryDto;
 import com.footlink.footlink.user.match.mapper.MatchResultMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -183,5 +185,60 @@ public class MatchResultServiceImpl implements MatchResultService{
         summary.goalsAgainst += scoreAgainst;
         
         map.put(teamId, summary);
+    }
+    @Override
+    public List<MatchParticipant> selectMatchParticipantList(Long matchNo) {
+    	
+    	return matchResultMapper.selectMatchParticipantList(matchNo);
+    }
+    @Override
+    public List<GameRe> getMatchResultsForEdit(Long matchNo) {
+
+        List<GameRe> games = matchResultMapper.selectMatchResultsByMatchNo(matchNo);
+        if (games != null) {
+            for (GameRe game : games) {
+                fillEmptyStats(game.getTeamAStats());
+                fillEmptyStats(game.getTeamBStats());
+            }
+        }
+
+        return games;
+    }
+    private void fillEmptyStats(List<PlayerRe> stats) {
+        int requiredSize = 5;
+        if (stats == null) {
+            stats = new ArrayList<>();
+        }
+        int currentSize = stats.size();
+        if (currentSize < requiredSize) {
+            for (int i = 0; i < requiredSize - currentSize; i++) {
+
+                stats.add(new PlayerRe()); 
+            }
+        }
+    }
+    @Override
+    @Transactional(readOnly = true) 
+    public MatchSummaryDto getMatchSummary(Long matchNo) {
+      
+        Map<String, Object> basicInfo = matchResultMapper.selectMatchBasicInfo(matchNo);
+        if (basicInfo == null) {
+            return null; 
+        }
+
+        List<TeamSummaryDto> teamSummaries = matchResultMapper.selectTeamSummaries(matchNo);
+
+        MatchSummaryDto summaryDto = new MatchSummaryDto();
+        summaryDto.setMatchDate((String) basicInfo.get("match_date")); 
+        summaryDto.setMatchTime((String) basicInfo.get("match_time"));
+        summaryDto.setStadiumName((String) basicInfo.get("stadium_nm"));
+        if (teamSummaries != null) {
+            for (TeamSummaryDto summary : teamSummaries) {
+                summary.setPoints(summary.getWins() * 3 + summary.getDraws());
+            }
+        }
+        summaryDto.setTeamSummaries(teamSummaries);
+
+        return summaryDto;
     }
 }

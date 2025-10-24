@@ -1,4 +1,4 @@
-package com.footlink.footlink.config;
+package com.footlink.footlink.common.config;
 
 import java.util.List;
 

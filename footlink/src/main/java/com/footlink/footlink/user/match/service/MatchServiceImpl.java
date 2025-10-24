@@ -45,24 +45,18 @@ public class MatchServiceImpl implements MatchService{
 		if (count > 0) { 
 			throw new IllegalStateException("이미 신청한 매치입니다.");
 		}
-
-        // 신청 로직
 		ApplyMatch application = ApplyMatch.builder()
 				.matchNo(matchNo)
 				.userId(userId)
 				.build();
-        // 4. (개선) 중복 파라미터 제거
+
 		matchMapper.insertApplication(application); 
-		
-	
-        // 마감 확인 로직
+
 		MatchDetail matchInfo = (MatchDetail) matchMapper.getMatchInfo(matchNo);
 		int totalPlayers = matchInfo.getTotalPlayers();
 		int applyPlayers = matchInfo.getApplyCount();
 			
-        // 5. (치명적 오류 수정) !=  -> ==
 		if (totalPlayers == applyPlayers) { 
-            // 6. (권장) 메서드 이름 명확화 (예: updateMatchStatusToClosed)
 			matchMapper.updateMatchStts(matchNo); 
 		}
 		
