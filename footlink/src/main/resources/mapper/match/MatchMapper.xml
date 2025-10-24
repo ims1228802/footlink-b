@@ -1,0 +1,425 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.footlink.footlink.user.match.mapper.MatchMapper">
+	<resultMap type="com.footlink.footlink.user.match.domain.Match" id="MatchResultMap">
+			<id column="match_no" 				property="matchNo"/>
+			<result column="field_nm" 			property="fieldName" />
+			<result column="file_path" 			property="filePath"/>
+			<result column="match_date" 		property="matchDate" />
+			<result column="stadium_nm" 		property="staName"/>
+			<result column="stadium_addr" 		property="staAddr"/>
+			<result column="match_time" 		property="matchTime" />
+			<result column="match_end_time" 	property="matchEndTime"/>
+			<result column="min_level_name" 	property="minLevelName"/>
+			<result column="max_level_name" 	property="maxLevelName"/>
+			<result column="total_players"  	property="totalPlayers"/>
+			<result column="gender_nm" 			property="genderName" />
+			<result column="match_stts" 		property="matchStts"/>
+			<result column="match_type_nm"  	property="matchTypeName" />
+			<result column="name" 				property="region"/>
+			<result column="application_count" 	property="applyCount" />
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.MatchDetail" id="MatchDetailMap">
+			<id column="match_no" 					property="matchNo"/>
+			<result column="field_nm" 				property="fieldName" />
+			<result column="spcffct"				property="spcffct"/>
+			<result column="file_path" 				property="filePath"/>
+			<result column="match_date" 			property="matchDate" />
+			<result column="stadium_nm" 			property="staName"/>
+			<result column="stadium_addr" 			property="staAddr"/>
+			<result column="match_time" 			property="matchTime" />
+			<result column="match_end_time" 		property="matchEndTime"/>
+			<result column="min_level_name" 		property="minLevelName"/>
+			<result column="max_level_name" 		property="maxLevelName"/>
+			<result column="total_players"  		property="totalPlayers"/>
+			<result column="gender_nm" 				property="genderName" />
+			<result column="match_type_nm"  		property="matchTypeName" />
+			<result column="name" 					property="region"/>
+			<result column="shower_use_psblty_yn" 	property="showerYn" />
+			<result column="restroom_use_psblty_yn" property="restYn" />
+			<result column="parking_use_psblty_yn" 	property="parkingYn" />
+			<result column="has_shoe_rental" 		property="shoRtYn" />
+			<result column="has_vest_rental" 		property="vestRtYn" />
+			<result column="has_ball_rental"  		property="ballRtYn" />
+			<result column="sells_drinks"  			property="sellDrink" />
+			<result column="application_count" 	property="applyCount" />
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.Player" id="playerMap">
+		<id column="application_no"/>
+		<result column="user_nm" 	property="userName"/>
+		<result column="user_id"	property="userId"/>
+		<result column="team_names"	property="teamName"/>
+		<result column="team_codes"	property="teamCode"/>
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.Stadium" id="staListMap">
+			<id column="stadium_no" 				property="staNo"/>
+			<result column="stadium_nm" 			property="staName" />
+			<result column="stadium_addr" 			property="staAddr" />
+			<result column="province_id"  			property="staPro"/>
+			<result column="shower_use_psblty_yn" 	property="showerYn" />
+			<result column="restroom_use_psblty_yn" property="restYn" />
+			<result column="parking_use_psblty_yn" 	property="parkingYn" />
+			<result column="has_shoe_rental" 		property="shoRtYn" />
+			<result column="has_vest_rental" 		property="vestRtYn" />
+			<result column="has_ball_rental"  		property="ballRtYn" />
+			<result column="sells_drinks"  			property="sellDrink" />
+			<result column="stadium_telno"  		property="staTelNo" />
+			<result column="dtl_cn"  				property="Detail" />
+			<result column="oper_yn"  				property="OperYn" />
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.Field" id="fieldListMap">
+		<id column = "field_no" 				property="fieldNo"/>
+		<result column="stadium_no" 			property="staNo"/>
+		<result column="field_nm" 				property="fieldName"/>
+		<result column="field_inside_outside" 	property="fio"/>
+		<result column="field_floor_material"	property="ffm"/>
+		<result column="file_no" 				property="fileNo"/>
+		<result column="spcffct" 				property="sft"/>
+		<result column="amt" 					property="amt"/>
+		<result column="operating_start_time" 	property="ost"/>
+		<result column="operating_end_time"		property="oet"/>
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.ApplyMatch" id="ApplyMatchMap">
+		<id column ="application_id"	property="ApplNo"/>
+		<result column="match_no"	property="matchNo"/>
+		<result column="user_id"	property="userId"/>
+		<result column="application_status"	property="ApplStatus"/>
+		<result column="applied_at"	property="ApplAt"/>
+	</resultMap>
+	<resultMap type="com.footlink.footlink.user.match.domain.EndList" id="EndListMap">
+		<id column="match_no" 					property="matchNo" />
+		<id column="game_sequence" 				property="gameSequence"/>
+		<result column="min_level_name" 		property="minLevelName"/>
+		<result column="max_level_name" 		property="maxLevelName"/>
+		<result column="stadium_nm" 			property="stadiumName"/>
+		<result column="gender_nm"				property="genderName"/>
+		<result column="win_team_cd" 			property="winnerTeam"/>
+		<result column="lose_team_cd" 			property="loserTeam"/>
+		<result column="winning_score" 			property="winScore"/>
+		<result column="losing_score" 			property="loseScore"/>
+	</resultMap>
+	
+	<select id="findAllMatch" resultMap="MatchResultMap">
+		SELECT
+		    m.*,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players, 
+		    min_lvl.tier AS min_level_name, 
+		    max_lvl.tier AS max_level_name,
+		    mt.match_type_nm AS match_method,
+		    match_state.match_stts,
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
+		FROM
+		    matches m
+		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
+		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
+		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
+		    INNER JOIN `fields` f ON m.field_no = f.field_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
+		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
+		    INNER JOIN files fl ON f.file_idx = fl.file_idx
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
+		WHERE
+		    m.match_stts_no = 1
+		    OR
+		    m.match_stts_no = 2
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
+	</select>
+	<select id="adminMatchList" resultMap="MatchResultMap">
+		SELECT
+		    m.*,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players, 
+		    min_lvl.tier AS min_level_name, 
+		    max_lvl.tier AS max_level_name,
+		    mt.match_type_nm AS match_method,
+		    match_state.match_stts,
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
+		FROM
+		    matches m
+		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
+		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
+		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
+		    INNER JOIN `fields` f ON m.field_no = f.field_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
+		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
+		    INNER JOIN files fl ON f.file_idx = fl.file_idx
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
+	</select>
+	<select id="stadiumList" resultMap="staListMap">
+		SELECT 
+			stadium_no, 
+			stadium_nm, 
+			stadium_addr,
+			province_id,
+			shower_use_psblty_yn,
+			restroom_use_psblty_yn,
+			parking_use_psblty_yn,
+			has_shoe_rental,
+			has_vest_rental,
+			has_ball_rental,
+			sells_drinks, 
+			stadium_telno, 
+			dtl_cn, 
+			oper_yn
+		FROM 
+			stadium;
+	</select>
+	<insert id="addLike">
+		INSERT INTO match_likes
+			( match_no, user_id, liked_at)
+		VALUES 
+			(#{matchNo}, #{userId}, NOW())
+	</insert>
+	<select id="getMatchInfo" resultMap="MatchDetailMap">
+		SELECT
+		    m.*,
+		    s.*,
+		    f.field_nm,
+		    f.file_idx,
+		    f.spcffct,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players, 
+		    min_lvl.tier AS min_level_name, 
+		    max_lvl.tier AS max_level_name,
+		    mt.match_type_nm AS match_method,
+		    match_state.match_stts,
+		    p.`name`,
+		    COUNT(ma.match_no) AS application_count
+		FROM
+		    matches m
+		    INNER JOIN match_types mt ON m.match_type_cd = mt.match_type_cd
+		    INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd 
+		    INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd 
+		    INNER JOIN `fields` f ON m.field_no = f.field_no
+		    INNER JOIN stadium s ON s.stadium_no = f.stadium_no 
+		    INNER JOIN match_statuses match_state ON m.match_stts_no = match_state.match_stts_no
+		    INNER JOIN files fl ON f.file_idx = fl.file_idx
+		    INNER JOIN provinces p ON s.province_id = p.province_id
+		    LEFT JOIN match_applications ma ON m.match_no = ma.match_no 
+		WHERE
+		    m.match_no = #{matchNo}
+		GROUP BY 
+		    m.match_no,
+		    s.stadium_nm,
+		    f.field_nm,
+		    f.file_idx,
+		    fl.file_path,
+		    mt.match_type_nm,
+		    mt.total_players,
+		    min_lvl.tier,
+		    max_lvl.tier,
+		    match_state.match_stts,
+		    p.`name`
+	</select>
+	<select id="findByKeyword" resultMap="staListMap">
+		SELECT 
+			*
+		FROM
+			stadium s LEFT JOIN provinces p
+			ON s.province_id = p.province_id
+		HAVING p.`name`=#{keyword};
+	</select>
+	<select id="findProvince">
+		SELECT 
+			province_id, 
+			`name`
+		FROM 
+			provinces
+	</select>
+	<select id="getfieldList" resultMap="fieldListMap">
+		SELECT
+			*
+		FROM
+			`fields` f LEFT JOIN stadium s
+			ON f.stadium_no = s.stadium_no
+		HAVING s.stadium_no = #{staNo};
+	</select>
+	<select id="getbookList" resultMap="MatchResultMap">
+		SELECT
+			*
+		FROM
+			matches m INNER JOIN fields f
+			ON m.field_no = f.field_no
+		where
+			m.field_no = #{fieldNo}
+			and
+			m.match_date = #{date}
+	</select>
+	<update id="updateMatchStts">
+		UPDATE matches
+			SET
+				match_stts_no=2
+			WHERE
+				match_no = #{matchNo}
+	</update>
+	
+	<insert id="addMatch" 
+		parameterType="com.footlink.footlink.user.match.domain.AddMatch"
+        useGeneratedKeys="true" 
+        keyProperty="matchNo" 
+        keyColumn="match_no">
+		INSERT INTO matches
+			(field_no, 
+			match_date, 
+			match_time, 
+			match_end_time, 
+			min_level_cd, 
+			max_level_cd, 
+			match_stts_no, 
+			gender_nm, 
+			match_type_cd)
+		VALUES 
+			(#{fieldNo}, 
+			#{matchDate},
+			#{matchTime}, 
+			#{matchEndTime}, 
+			#{minLevelCode},
+			#{maxLevelCode}, 
+			'1', 
+			#{gender}, 
+			#{matchType})
+	</insert>
+	<select id="countApplicationByUser" resultType="int">
+	    SELECT COUNT(*)
+	    FROM match_applications
+	    WHERE match_no = #{matchNo} AND user_id = #{userId}
+	</select>
+	<insert id="insertApplication" parameterType="com.footlink.footlink.user.match.domain.ApplyMatch">
+		INSERT INTO match_applications
+			( match_no, user_id, application_status, applied_at)
+		VALUES 
+			( #{matchNo}, #{userId}, '매치 신청', NOW())
+	</insert>
+	<select id="getEndList" resultType="com.footlink.footlink.user.match.domain.EndList">
+		WITH ranked_teams AS (
+        SELECT
+            mfr.match_no,
+            mfr.team_cd,
+            mfr.wins,
+            mfr.draws,
+            mfr.losses,
+            mfr.goal_difference,
+            mfr.goals_for,
+            ROW_NUMBER() OVER(PARTITION BY mfr.match_no
+                              ORDER BY mfr.wins DESC, mfr.goal_difference DESC, mfr.goals_for DESC) AS rank_num
+        FROM
+            match_final_results mfr
+    ),
+    final_outcome AS (
+        SELECT
+            match_no,
+            MAX(CASE WHEN rank_num = 1 THEN team_cd END) AS final_winner_cd,
+            MAX(CASE WHEN rank_num = 1 THEN wins END) AS winner_score,
+            MAX(CASE WHEN rank_num = 2 THEN team_cd END) AS final_loser_cd,
+            MAX(CASE WHEN rank_num = 2 THEN wins END) AS loser_score 
+        FROM
+            ranked_teams
+        GROUP BY
+            match_no
+    )
+    SELECT
+        m.match_no,
+        m.match_date,
+        m.match_time,
+        m.match_end_time,
+        s.stadium_nm,
+        m.gender_nm,
+        min_lvl.tier AS min_level_name,
+        max_lvl.tier AS max_level_name,
+        winner_team.team_nm AS winner_team_name,
+        loser_team.team_nm AS loser_team_name,
+        fo.winner_score,
+        COALESCE(fo.loser_score, 0) AS loser_score
+    FROM
+        final_outcome fo
+        INNER JOIN matches m ON fo.match_no = m.match_no
+        INNER JOIN team winner_team ON fo.final_winner_cd = winner_team.team_cd
+        LEFT JOIN team loser_team ON fo.final_loser_cd = loser_team.team_cd
+        INNER JOIN `fields` f ON m.field_no = f.field_no
+        INNER JOIN stadium s ON f.stadium_no = s.stadium_no
+        INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd
+        INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd
+        INNER JOIN match_statuses ms ON m.match_stts_no = ms.match_stts_no
+    WHERE
+        ms.match_stts = '매치 종료'
+    ORDER BY
+        m.match_date DESC, m.match_time DESC 
+	</select>
+	<select id="isLikedByUser">
+		SELECT 
+			COUNT(*)
+		FROM 
+			match_likes
+		WHERE
+			match_no=#{matchNo}
+			and
+			user_id=#{userId}
+	</select>
+	<delete id="removeLike">
+		DELETE 
+		FROM 
+			match_likes 
+		WHERE 
+			match_no = #{matchNo} 
+			AND 
+			user_id = #{userId}
+	</delete>
+	<select id="getPlayerList" resultMap="playerMap">
+		SELECT
+		    u.user_id,
+		    u.user_nm,
+		    GROUP_CONCAT(t.team_cd SEPARATOR ', ') AS team_codes, 
+		    GROUP_CONCAT(t.team_nm SEPARATOR ', ') AS team_names
+		FROM
+		    match_applications ma
+		LEFT JOIN
+		    `user` u ON ma.user_id = u.user_id
+		LEFT JOIN
+		    team_user tu ON u.user_id = tu.user_cd
+		LEFT JOIN
+		    team t ON tu.team_cd = t.team_cd
+		WHERE
+		    ma.match_no = #{matchNo}
+		GROUP BY
+		    u.user_id, u.user_nm;
+	</select>
+    
+</mapper>

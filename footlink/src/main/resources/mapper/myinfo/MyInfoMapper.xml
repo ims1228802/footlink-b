@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.footlink.footlink.user.myinfo.mapper.MyInfoMapper">
+
+	<!-- 결과 매핑 -->
+	<resultMap id="MyInfoMap"
+		type="com.footlink.footlink.user.myinfo.domain.MyInfo">
+		<id property="id" column="user_id" />
+		<result property="role" column="authrt_cd" />
+		<result property="email" column="user_email" />
+		<result property="phone" column="user_phn_num" />
+		<result property="birth" column="user_birth" />
+		<result property="gender" column="user_gender" />
+		<result property="addr" column="user_addr" />
+		<result property="joinYmd" column="join_ymd" />
+		<result property="name" column="user_nm" />
+		<result property="profile" column="file_path" />
+		<result property="pstAblty" column="user_pst_ablty" />
+		<result property="pst" column="user_pst" />
+		<result property="level" column="user_level" />
+		<result property="intro" column="user_intro" />
+		<result property="isProfilePublic" column="is_profile_public"/>
+        <result property="isLevelHidden"  column="is_level_hidden"/>
+		
+
+		<!-- ✅ 팀 리스트 매핑 -->
+		<collection property="teams"
+			ofType="com.footlink.footlink.user.myinfo.domain.MyTeam">
+			<result property="teamCd" column="team_cd" />
+			<result property="teamNm" column="team_nm" />
+			<result property="rgnNm" column="rgn_nm" />
+			<result property="gender" column="gender" />
+			<result property="ageGroup" column="ageGroup" />
+			<result property="actDow" column="act_dow" />
+			<result property="level" column="level" />
+		</collection>
+		
+		
+	</resultMap>
+
+	<!-- ✅ 이메일 기준으로 내 정보 조회 -->
+	<select id="getMyInfoByEmail" resultMap="MyInfoMap">
+		SELECT
+		u.user_id,
+		u.authrt_cd,
+		u.user_email,
+		u.user_phn_num,
+		u.user_birth,
+		u.user_gender,
+		u.user_addr,
+		u.join_ymd,
+		u.user_nm,
+		u.user_pst_ablty,
+		u.user_pst,
+		u.user_level,
+		u.user_intro,
+		f.file_path,
+		t.team_cd,
+		t.team_nm,
+		t.rgn_nm,
+		t.gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow,
+		l.tier AS level,
+		u.is_profile_public,
+		u.is_level_hidden
+		FROM user u
+		LEFT JOIN files f ON u.user_img = f.file_idx
+		LEFT JOIN team_user tu ON u.user_id = tu.user_cd
+		LEFT JOIN team t ON tu.team_cd = t.team_cd
+		LEFT JOIN team_age ta ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l ON t.level_cd = l.level_cd
+		WHERE u.user_email = #{email}
+	</select>
+	
+	<update id="modifyMyInfo"
+		parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+		UPDATE user
+		<set>
+			<if test="name != null and name != ''">
+				user_nm = #{name},
+			</if>
+			<if test="intro != null and intro != ''">
+				user_intro = #{intro},
+			</if>
+			<if test="pst != null and pst != ''">
+				user_pst = #{pst},
+			</if>
+			<if test="pstAblty != null and pstAblty != ''">
+				user_pst_ablty = #{pstAblty},
+			</if>
+			<if test="addr != null and addr != ''">
+				user_addr = #{addr},
+			</if>
+			<if test="profile != null and profile != ''">
+				user_img = #{profile},
+			</if>
+		</set>
+		WHERE user_email = #{email}
+	</update>
+
+	<!-- 팀 조회 -->
+	<select id="getMyTeamsByEmail" resultType="map">
+		SELECT
+		t.team_cd AS
+		teamCd,
+		t.team_nm AS teamNm,
+		t.rgn_nm AS rgnNm,
+		t.gender AS gender,
+		ta.team_age_name AS ageGroup,
+		t.act_dow AS actDow,
+		l.tier AS level,
+		(
+		SELECT COUNT(*)
+		FROM team_user tu2
+		WHERE tu2.team_cd = t.team_cd
+		) AS
+		memberCount
+		FROM team t
+		JOIN team_user tu
+		ON t.team_cd = tu.team_cd
+		JOIN
+		user u
+		ON tu.user_cd = u.user_id
+		LEFT JOIN team_age ta
+		ON t.team_age =
+		ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		WHERE
+		u.user_email = #{email}
+	</select>
+	
+	<!-- 신청한 경기 조회 -->
+	
+	<select id="getAppliedMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyAppliedMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.gender_nm,
+	    m.match_type_cd,
+	    l1.tier AS minLevel,
+	    l2.tier AS maxLevel
+	  FROM match_applications a
+	  JOIN matches m ON a.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  LEFT JOIN levels l1 ON m.min_level_cd = l1.level_cd
+	  LEFT JOIN levels l2 ON m.max_level_cd = l2.level_cd
+	  WHERE a.user_id = #{email}
+	</select>
+	
+	<!-- 찜한 경기 조회 -->
+
+	<select id="getLikeMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyLikeMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.gender_nm,
+	    m.match_type_cd,
+	    l1.tier AS minLevel,
+	    l2.tier AS maxLevel
+	  FROM match_likes ml
+	  JOIN matches m ON ml.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  LEFT JOIN levels l1 ON m.min_level_cd = l1.level_cd
+	  LEFT JOIN levels l2 ON m.max_level_cd = l2.level_cd
+	  WHERE ml.user_id = #{email}
+	</select>
+	
+	<!-- 완료한 경기 조회 -->
+	
+	<select id="getCompletedMatches" resultType="com.footlink.footlink.user.myinfo.domain.MyCompletedMatch">
+	  SELECT 
+	    m.match_no,
+	    m.match_date,
+	    m.match_time,
+	    f.field_nm AS stadium,
+	    m.match_type_cd,
+	    r.home_score,
+	    r.away_score,
+	    r.winner
+	  FROM match_results r
+	  JOIN matches m ON r.match_no = m.match_no
+	  JOIN fields f ON m.field_no = f.field_no
+	  WHERE m.match_stts_no = 3
+	</select>
+	
+	<!-- 공개설정 조회 -->
+	
+	<select id="getMySettingsByEmail" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  SELECT
+	    u.is_profile_public AS isProfilePublic,
+	    u.is_level_hidden   AS isLevelHidden
+	  FROM user u
+	  WHERE u.user_email = #{email}
+	</select>
+	
+	<!-- 공개설정 업데이트 -->
+	
+	<update id="updateMySettingsByEmail" parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  UPDATE user
+	  <set>
+	    <if test="isProfilePublic != null">
+	      is_profile_public = #{isProfilePublic},
+	    </if>
+	    <if test="isLevelHidden != null">
+	      is_level_hidden = #{isLevelHidden},
+	    </if>
+	  </set>
+	  WHERE user_email = #{email}
+	</update>
+
+	<update id="updatePhone" parameterType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+	  UPDATE user
+	  SET user_phn_num = #{phone}
+	  WHERE user_email = #{email}
+	</update>
+	
+	<update id="updatePassword">
+	  UPDATE user
+	  SET user_pw = #{password}
+	  WHERE user_email = #{email}
+	</update>	
+		
+	<update id="withdrawUser" parameterType="string">
+	  UPDATE user
+	  SET is_deleted = 1
+	  WHERE user_email = #{email}
+	</update>	
+	
+</mapper>

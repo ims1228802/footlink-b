@@ -1,0 +1,214 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.footlink.footlink.user.match.mapper.MatchResultMapper">
+	<resultMap type="com.footlink.footlink.user.match.domain.ResultDTO.MatchParticipant" id="MatchParticipantMap">
+		<id column="participant_id"	property="participantId"/>
+		<result column="match_no"	property="matchNo"/>
+		<result column="user_id"	property="userId"/>
+		<result column="team_cd"	property="teamCd"/>
+		<result column="team_nm"	property="teamName"/>
+		<result column="user_nm"	property="userName"/>
+	</resultMap>
+	<resultMap id="PlayerReMap" type="com.footlink.footlink.user.match.domain.ResultDTO.PlayerRe">
+        <result property="playerId" column="user_id"/>
+        <result property="goal" column="goal"/>
+        <result property="assist" column="assist"/>
+        <result property="save" column="saves"/>
+    </resultMap>
+
+    <resultMap id="GameReMap" type="com.footlink.footlink.user.match.domain.ResultDTO.GameRe">
+        <result property="gameNumber" column="game_number"/>
+        <result property="selectedTeamA" column="team_a_cd"/>
+        <result property="selectedTeamB" column="team_b_cd"/>
+        <collection property="teamAStats"
+                    column="{matchNo=match_no, gameNumber=game_number, teamCd=team_a_cd}"
+                    select="selectMatchParticipantStatesForGame"/>
+        <collection property="teamBStats"
+                    column="{matchNo=match_no, gameNumber=game_number, teamCd=team_b_cd}"
+                    select="selectMatchParticipantStatesForGame"/>
+    </resultMap>
+    <resultMap id="TeamSummaryMap" type="com.footlink.footlink.user.match.domain.ResultDTO.TeamSummaryDto">
+        <result property="teamCode" column="team_cd"/>
+        <result property="teamName" column="team_nm"/>
+        <result property="wins" column="wins"/>
+        <result property="draws" column="draws"/>
+        <result property="losses" column="losses"/>
+        <result property="goalDifference" column="goal_difference"/>
+    </resultMap>
+    <delete id="deleteMatchParticipantsState" parameterType="long">
+        DELETE FROM match_participants_statas WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchResults" parameterType="long">
+        DELETE FROM match_results WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchFinalResults" parameterType="long">
+        DELETE FROM match_final_results WHERE match_no = #{matchNo}
+    </delete>
+    
+    <delete id="deleteMatchParticipants" parameterType="long">
+        DELETE FROM match_participants WHERE match_no = #{matchNo}
+    </delete>
+
+    <insert id="insertMatchParticipantsStateList" parameterType="list">
+        INSERT INTO match_participants_statas
+            (match_no, game_number, user_id, team_cd, goal, assist, saves)
+        VALUES
+        <foreach collection="list" item="state" separator=",">
+            (
+                #{state.matchNo}, 
+                #{state.gameNumber}, 
+                #{state.userId}, 
+                #{state.teamCd}, 
+                #{state.goal}, 
+                #{state.assist}, 
+                #{state.saves}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertMatchResultList" parameterType="list">
+        INSERT INTO match_results
+            (match_no, 
+             game_number, 
+             team_a_cd, 
+             team_a_score, 
+             team_b_cd, 
+             team_b_score, 
+             winner_team_cd, 
+             loser_team_cd)
+        VALUES
+        <foreach collection="list" item="result" separator=",">
+            (
+                #{result.matchNo},
+                #{result.gameNumber},
+                #{result.teamACd},
+                #{result.teamAScore},
+                #{result.teamBCd},
+                #{result.teamBScore},
+                #{result.winnerTeamCd},
+                #{result.loserTeamCd}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertMatchFinalResultList" parameterType="list">
+        INSERT INTO match_final_results
+            (match_no, team_cd, wins, draws, losses, goals_for, goals_against, goal_difference)
+        VALUES
+        <foreach collection="list" item="final" separator=",">
+            (
+                #{final.matchNo},
+                #{final.teamCd},
+                #{final.wins},
+                #{final.draws},
+                #{final.losses},
+                #{final.goalsFor},
+                #{final.goalsAgainst},
+                #{final.goalDifference}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertMatchParticipantList" parameterType="list">
+        INSERT INTO match_participants
+            (match_no, user_id, team_cd)
+        VALUES
+        <foreach collection="list" item="p" separator=",">
+            (
+                #{p.matchNo},
+                #{p.userId},
+                #{p.teamCd}
+            )
+        </foreach>
+    </insert>
+    <update id="updateMatchStatusToCompleted">
+        UPDATE `matches`
+        SET
+            match_stts_no = #{toStatus}
+        WHERE
+            match_no = #{matchNo}
+            AND 
+            match_stts_no = #{fromStatus}
+    </update>
+	<select id="selectMatchParticipantList" parameterType="long" resultMap="MatchParticipantMap">
+		SELECT DISTINCT
+		    mp.user_id,
+		    u.user_nm,     
+		    mp.team_cd,
+		    t.team_nm  
+		FROM
+		    match_participants mp
+		LEFT JOIN
+		    `user` u ON mp.user_id = u.user_id 
+		LEFT JOIN
+		    team t ON mp.team_cd = t.team_cd  
+		WHERE
+		    mp.match_no = #{matchNo};
+	</select>
+	<select id="selectMatchResultsByMatchNo" resultMap="GameReMap" parameterType="long">
+		SELECT
+            result_id,
+            match_no,
+            game_number,
+            team_a_cd,
+            team_a_score,
+            team_b_cd,
+            team_b_score,
+            game_result,
+            winner_team_cd,
+            loser_team_cd
+        FROM
+            match_results
+        WHERE
+            match_no = #{matchNo}
+        ORDER BY
+            game_number ASC 
+	</select>
+	<select id="selectMatchParticipantStatesForGame" resultMap="PlayerReMap" parameterType="map">
+		SELECT
+            participant_state_id,
+            match_no,
+            game_number,
+            user_id,
+            team_cd,
+            goal,
+            assist,
+            saves
+        FROM
+            match_participants_statas
+        WHERE
+            match_no = #{matchNo}
+            AND game_number = #{gameNumber}
+            AND team_cd = #{teamCd}
+	</select>
+	<select id="selectMatchBasicInfo" resultType="map" parameterType="long">
+        SELECT
+            m.match_date,
+            DATE_FORMAT(m.match_time, '%H:%i') AS match_time,
+            s.stadium_nm,
+            f.field_nm
+        FROM
+            matches m
+        INNER JOIN `fields` f ON m.field_no = f.field_no
+        INNER JOIN stadium s ON f.stadium_no = s.stadium_no
+        WHERE
+            m.match_no = #{matchNo}
+    </select>
+    <select id="selectTeamSummaries" resultMap="TeamSummaryMap" parameterType="long">
+        SELECT
+            mfr.team_cd,
+            t.team_nm,
+            mfr.wins,
+            mfr.draws,
+            mfr.losses,
+            mfr.goal_difference
+        FROM
+            match_final_results mfr
+        INNER JOIN team t ON mfr.team_cd = t.team_cd
+        WHERE
+            mfr.match_no = #{matchNo}
+        ORDER BY
+            mfr.wins DESC, mfr.goal_difference DESC, mfr.goals_for DESC
+    </select>
+</mapper>
+    

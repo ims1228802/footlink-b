@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mapper DTD 선언 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- SQL Mapping -->
+<mapper namespace="com.footlink.footlink.user.team.mapper.TeamMapper">
+	<resultMap type="com.footlink.footlink.user.team.domain.Team" id="TeamList">
+		<id column="team_cd"			property="teamCode"/>
+		<result column="team_nm"		property="teamName"/>
+		<result column="rgn_nm"			property="regionName"/>
+		<result column="mtn_tm"			property="meetingTimeCode"/>
+		<result column="team_age"		property="teamAgeCode"/>
+		<result column="level_cd"		property="levelCode"/>
+		<result column="is_temp"		property="isTemp"/>
+		<result column="view_cnt"		property="viewCount"/>
+		<result column="favorite_cnt"	property="favoriteCount"/>
+		<result column="stadium_nm"		property="stadium"/>
+		<result column="gender"			property="gender"/>
+		<result column="act_dow"		property="activeDoWeek"/>
+	</resultMap>
+	
+	<select id="getTeamList" resultMap="TeamList">
+		SELECT
+			t.team_cd,
+			t.team_nm,
+			t.rgn_nm,
+			m.mtn_tm_nm AS meetingTime,
+			ta.team_age_name AS teamAge,
+			l.tier AS level,
+			t.is_temp,
+			t.view_cnt,
+			t.favorite_cnt,
+			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
+			s.stadium_nm,
+			t.gender,
+			t.act_dow
+		FROM
+			team t
+		LEFT JOIN meeting_times m
+		ON t.mtn_tm = m.mtn_tm_cd
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		LEFT JOIN stadium s
+		ON t.stadium = s.stadium_no;
+	</select>
+	
+	<select id="getSearchTeamList" resultMap="TeamList" parameterType="String">
+		SELECT
+			t.team_cd,
+			t.team_nm,
+			t.rgn_nm,
+			m.mtn_tm_nm AS meetingTime,
+			ta.team_age_name AS teamAge,
+			l.tier AS level,
+			t.is_temp,
+			t.view_cnt,
+			t.favorite_cnt,
+			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
+			s.stadium_nm AS stadium
+		FROM
+			team t
+		LEFT JOIN meeting_times m
+		ON t.mtn_tm = m.mtn_tm_cd
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		LEFT JOIN stadium s
+		ON t.stadium = s.stadium_no
+		WHERE t.team_nm like CONCAT('%', #{inputParam}, '%');
+	</select>
+	
+	<select id="getArea" resultType="com.footlink.footlink.user.team.domain.StadiumArea" >
+		SELECT
+			p.province_id AS provinceId,
+			p.`name`
+		FROM provinces p
+		ORDER BY p.province_id;
+	</select>
+	
+	<select id="getStadium" resultType="com.footlink.footlink.user.team.domain.StadiumArea" >
+		SELECT
+			s.stadium_no AS stadiumNo,
+			s.stadium_nm AS stadiumName,
+			s.stadium_addr AS stadiumAddr,
+			s.province_id AS provinceId
+		FROM stadium s;
+	</select>
+	
+	<select id="getTeamDetail" resultMap="TeamList" parameterType="String">
+		SELECT
+			t.team_cd,
+			t.team_nm,
+			t.rgn_nm,
+			m.mtn_tm_nm AS meetingTime,
+			ta.team_age_name AS teamAge,
+			l.tier AS level,
+			t.is_temp,
+			t.view_cnt,
+			t.favorite_cnt,
+			(SELECT COUNT(team_cd) FROM team_user tu WHERE tu.team_cd = t.team_cd) AS userCount,
+			s.stadium_nm,
+			t.gender,
+			t.act_dow
+		FROM
+			team t
+		LEFT JOIN meeting_times m
+		ON t.mtn_tm = m.mtn_tm_cd
+		LEFT JOIN team_age ta
+		ON t.team_age = ta.team_age_cd
+		LEFT JOIN levels l
+		ON t.level_cd = l.level_cd
+		LEFT JOIN stadium s
+		ON t.stadium = s.stadium_no
+		WHERE t.team_cd = #{teamCode};
+	</select>
+	
+	<select id="getTeamUserList" parameterType="String" resultType="com.footlink.footlink.user.myinfo.domain.MyInfo">
+		SELECT
+			u.user_nm as name,
+			u.user_level as level
+		FROM
+		`user` u
+		LEFT JOIN team_user tu
+		ON u.user_id = tu.user_cd
+		WHERE tu.team_cd = #{teamCode};
+	</select>
+	
+	<select id="getTeamState" resultType="com.footlink.footlink.user.team.domain.State" parameterType="String">
+		SELECT
+			ts.attack,
+			ts.speed,
+			ts.dribble,
+			ts.stamina,
+			ts.defense,
+			ts.physical,
+			ts.pass,
+			ts.shot
+		FROM
+			team_state ts
+		WHERE team_cd = #{teamCode};
+	</select>
+	
+	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
+		INSERT INTO team(
+			 team_cd, 
+			 team_nm, 
+			 rgn_nm, 
+			 mtn_tm, 
+			 team_age, 
+			 level_cd, 
+			 is_temp, 
+			 stadium, 
+			 gender, 
+			 act_dow
+			)
+		VALUES (
+			 #{teamCode}, 
+			 #{teamName}, 
+			 #{regionName},
+			  (SELECT mt.mtn_tm_cd FROM meeting_times mt WHERE mt.mtn_tm_nm = #{meetingTime}), 
+			  (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{teamAge}, '%')), 
+			  (SELECT l.level_cd FROM levels l WHERE l.tier = #{level}), 
+			  #{isTemp}, 
+			  (SELECT s.stadium_no FROM stadium s WHERE s.stadium_nm = #{stadium}), 
+			  #{gender}, 
+			  #{activeDoWeek}
+			);
+	</insert>
+	
+	<insert id="addTeamState" parameterType="com.footlink.footlink.user.team.domain.State">
+		INSERT INTO team_state(
+			 team_cd, 
+			 attack, 
+			 speed, 
+			 dribble, 
+			 stamina, 
+			 defense, 
+			 physical, 
+			 pass, 
+			 shot
+			 )
+		VALUES (
+			 #{teamCode}, 
+			 #{attack}, 
+			 #{speed}, 
+			 #{dribble}, 
+			 #{stamina}, 
+			 #{defense}, 
+			 #{physical}, 
+			 #{pass}, 
+			 #{shot}
+			);
+	</insert>
+	
+</mapper>
