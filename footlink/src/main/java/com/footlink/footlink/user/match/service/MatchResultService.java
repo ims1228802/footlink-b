@@ -14,4 +14,5 @@ import com.footlink.footlink.user.match.domain.ResultDTO.ResultDataDto;
 
 public interface MatchResultService {
 	void saveMatchResults(ResultDataDto resultData);
+	
 }

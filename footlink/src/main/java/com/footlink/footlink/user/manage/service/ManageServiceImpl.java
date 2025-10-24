@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.footlink.footlink.config.SolapiProperties;
+import com.footlink.footlink.common.config.SolapiProperties;
 import com.footlink.footlink.user.manage.domain.SignUpRequest;
 import com.footlink.footlink.user.manage.domain.User;
 import com.footlink.footlink.user.manage.domain.VerificationRequest;
