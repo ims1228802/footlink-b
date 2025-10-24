@@ -329,8 +329,7 @@
 			( #{matchNo}, #{userId}, '매치 신청', NOW())
 	</insert>
 	<select id="getEndList" resultType="com.footlink.footlink.user.match.domain.EndList">
-		 WITH ranked_teams AS (
-        -- 1. match_final_results 테이블에서 팀별 최종 성적과 순위를 매깁니다.
+		WITH ranked_teams AS (
         SELECT
             mfr.match_no,
             mfr.team_cd,
@@ -339,27 +338,23 @@
             mfr.losses,
             mfr.goal_difference,
             mfr.goals_for,
-            -- 순위 기준: 승리 > 골득실 > 다득점 순서
             ROW_NUMBER() OVER(PARTITION BY mfr.match_no
                               ORDER BY mfr.wins DESC, mfr.goal_difference DESC, mfr.goals_for DESC) AS rank_num
         FROM
             match_final_results mfr
     ),
     final_outcome AS (
-        -- 2. 각 매치별로 1위(승자)와 2위(패자) 팀 정보를 추출합니다.
         SELECT
             match_no,
             MAX(CASE WHEN rank_num = 1 THEN team_cd END) AS final_winner_cd,
-            MAX(CASE WHEN rank_num = 1 THEN wins END) AS winner_score, -- 최종 승리 횟수
+            MAX(CASE WHEN rank_num = 1 THEN wins END) AS winner_score,
             MAX(CASE WHEN rank_num = 2 THEN team_cd END) AS final_loser_cd,
-            MAX(CASE WHEN rank_num = 2 THEN wins END) AS loser_score   -- 최종 패배 (2위팀) 횟수
-            -- 필요하다면 draws, losses, goal_difference 등 다른 정보도 추가 가능
+            MAX(CASE WHEN rank_num = 2 THEN wins END) AS loser_score 
         FROM
             ranked_teams
         GROUP BY
             match_no
     )
-    -- 3. 최종 결과와 매치 기본 정보, 기타 필요한 정보를 JOIN하여 조회합니다.
     SELECT
         m.match_no,
         m.match_date,
@@ -377,14 +372,14 @@
         final_outcome fo
         INNER JOIN matches m ON fo.match_no = m.match_no
         INNER JOIN team winner_team ON fo.final_winner_cd = winner_team.team_cd
-        LEFT  JOIN team loser_team ON fo.final_loser_cd = loser_team.team_cd
+        LEFT JOIN team loser_team ON fo.final_loser_cd = loser_team.team_cd
         INNER JOIN `fields` f ON m.field_no = f.field_no
         INNER JOIN stadium s ON f.stadium_no = s.stadium_no
         INNER JOIN levels min_lvl ON m.min_level_cd = min_lvl.level_cd
         INNER JOIN levels max_lvl ON m.max_level_cd = max_lvl.level_cd
         INNER JOIN match_statuses ms ON m.match_stts_no = ms.match_stts_no
     WHERE
-        ms.match_stts = '매치 종료' 
+        ms.match_stts = '매치 종료'
     ORDER BY
         m.match_date DESC, m.match_time DESC 
 	</select>

@@ -12,4 +12,5 @@ public interface MatchResultService {
 	List<MatchParticipant> selectMatchParticipantList(Long matchNo);
 	List<GameRe> getMatchResultsForEdit(Long matchNo);
 	MatchSummaryDto getMatchSummary(Long matchNo);
+
 }
