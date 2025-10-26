@@ -88,6 +88,26 @@ public class TeamController {
 		return teamCalendar;
 	}
 	
+	// 팀이 모집하고 있는지 카운트 조회
+	@GetMapping("team/teamRecruitCnt")
+	public int getRecruitCount(@RequestParam String teamCode) {
+		return teamService.getRecruitCount(teamCode);
+	}
+	
+	// 팀원 모집 내용 조회
+	@GetMapping("team/recruitInfo")
+	public Recruit getRecruitInfo(@RequestParam String teamCode) {
+		Recruit teamRecruit = teamService.getRecruitInfo(teamCode);
+		return teamRecruit;
+	}
+	
+	// 팀 일정 상세 조회
+	@GetMapping("team/calendar/detail")
+	public Calendar getCalendarDetail (@RequestParam String teamDateCode) {
+		Calendar calendarDetail = teamService.getCalendarDetail(teamDateCode);
+		return calendarDetail;
+	}
+	
 	// 팀 추가하기
 	@PostMapping("team/addTeam")
 	public ResponseEntity<String> addTeam(@RequestBody Map<String, Object> team) {
@@ -376,6 +396,13 @@ public class TeamController {
 		return ResponseEntity.ok("일정 등록 성공");
 	}
 	
+	// 일정 삭제하기
+	@DeleteMapping("team/deleteCalendar")
+	public ResponseEntity<String> deleteCalendar(@RequestParam String teamDateCode){
+		teamService.deleteCalendar(teamDateCode);
+		return ResponseEntity.ok("일정 삭제 성공");
+	}
+	
 	// 팀원 모집 추가
 	@PostMapping("team/addTeamRecruit")
 	public ResponseEntity<String> addRecruit(@RequestBody Map<String, String> recruit){
@@ -437,5 +464,75 @@ public class TeamController {
 		log.info("recruit: {}", recruit);
 		
 		return ResponseEntity.ok("팀원 모집 등록 성공");
+	}
+	
+	// 팀원 모집 수정
+	@PutMapping("team/editTeamRecruit")
+	public ResponseEntity<String> editRecruit(@RequestBody Map<String, String> recruit){
+		Recruit recruitDTO = new Recruit();
+		
+		String teamCode = recruit.get("teamCode");
+		String teamDistinction = recruit.get("teamDistinction");
+		String stadium = recruit.get("stadium");
+		String city = recruit.get("city");
+		String area = recruit.get("area");
+		String age = recruit.get("age");
+		String gender = recruit.get("gender");
+		String level = recruit.get("level");
+		String teamImg = recruit.get("teamImg");
+		String contents = recruit.get("contents");
+		
+		// 성별
+		switch(gender) {
+		case "man":
+			recruitDTO.setGender("남자");
+			break;
+		case "woman":
+			recruitDTO.setGender("여자");
+			break;
+		default:
+			recruitDTO.setGender("남녀모두");
+			break;
+		}
+		
+		// 레벨
+		switch(level) {
+		case "noneLevel":
+			recruitDTO.setLevel("실력무관");
+			break;
+		case "beginner":
+			recruitDTO.setLevel("비기너");
+			break;
+		case "amateur":
+			recruitDTO.setLevel("아마추어");
+			break;
+		case "semiPro":
+			recruitDTO.setLevel("세미프로");
+			break;
+		case "pro":
+			recruitDTO.setLevel("프로");
+			break;
+		}
+		
+		recruitDTO.setAge(age);
+		recruitDTO.setArea(area);
+		recruitDTO.setCity(city);
+		recruitDTO.setContents(contents);
+		recruitDTO.setStadium(stadium);
+		recruitDTO.setTeamCode(teamCode);
+		recruitDTO.setTeamDistinction(teamDistinction);
+		
+		teamService.editTeamRecruit(recruitDTO);
+		
+		log.info("recruit: {}", recruit);
+		
+		return ResponseEntity.ok("팀원 모집 수정 성공");
+	}
+
+	// 팀원 모집 삭제
+	@DeleteMapping("team/deleteRecruit")
+	public ResponseEntity<String> deleteRecruit(@RequestParam String teamCode){
+		teamService.deleteRecruit(teamCode);
+		return ResponseEntity.ok("팀원 모집 삭제 성공");
 	}
 }
