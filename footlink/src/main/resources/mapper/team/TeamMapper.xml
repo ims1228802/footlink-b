@@ -36,7 +36,8 @@
 			s.stadium_nm,
 			t.gender,
 			t.act_dow,
-			t.is_deleted
+			t.is_deleted,
+			(SELECT COUNT(*) FROM team_recruit_post WHERE team_cd = t.team_cd) as recruitCount
 		FROM
 			team t
 		LEFT JOIN meeting_times m
@@ -171,6 +172,40 @@
 		WHERE
 			ts.team_cd = #{teamCode};
 	</select>
+	
+	<select id="getRecruitCount" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM team_recruit_post WHERE team_cd = #{teamCode};
+	</select>
+	
+	<select id="getRecruitInfo" resultType="com.footlink.footlink.user.team.domain.Recruit" parameterType="String">
+		SELECT
+			team_cd AS teamCode, 
+			rcrt_aply_cn AS contents, 
+			(SELECT team_age_name FROM team_age WHERE team_age_cd = rcrt_team_age) AS age, 
+			rcrt_gender AS gender, 
+			rcrt_level AS level, 
+			rcrt_team_dvsn AS teamDistinction
+		FROM team_recruit_post trp
+		WHERE
+			trp.team_cd = #{teamCode};
+	</select>
+	
+	<select id="getCalendarDetail" parameterType="String">
+		SELECT 
+			ts.team_dt_cd AS teamDateCode, 
+			ts.team_cd AS teamCode, 
+			ts.ttl AS title, 
+			ts.plc_nm AS placeName, 
+			ts.prnmnt_ymd AS date, 
+			ts.bgng_time AS startTime, 
+			ts.end_time AS endTime, 
+			ts.dtl_cn AS contents, 
+			ts.reg_ymd AS registrationDate
+		FROM
+			team_schedules ts
+		WHERE
+			ts.team_dt_cd = #{teamDateCode};
+	</select> 
 	
 	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
 		INSERT INTO team(
@@ -341,6 +376,20 @@
 		</where>
 	</update>
 	
+	<update id="editTeamRecruit" parameterType="com.footlink.footlink.user.team.domain.Recruit">
+		UPDATE team_recruit_post
+		<set>
+			rcrt_team_dvsn = #{teamDistinction},
+			rcrt_team_age = (SELECT ta.team_age_cd FROM team_age ta WHERE ta.team_age_name LIKE CONCAT('%', #{age}, '%')),
+			rcrt_gender = #{gender},
+			rcrt_level = #{level},
+			rcrt_aply_cn = #{contents}
+		</set>
+		<where>
+			team_cd = #{teamCode};
+		</where>
+	</update>
+	
 	<update id="deleteTeam" parameterType="String">
 		UPDATE team
 		<set>
@@ -357,5 +406,17 @@
 			user_cd = #{userId}
 		AND
 			team_cd = #{teamCode}
+	</delete>
+	
+	<delete id="deleteCalendar" parameterType="String">
+		DELETE FROM team_schedules
+		WHERE
+			team_dt_cd = #{teamDateCode};
+	</delete>
+	
+	<delete id="deleteRecruit" parameterType="String">
+		DELETE FROM team_recruit_post
+		WHERE
+			team_cd = #{teamCode};
 	</delete>
 </mapper>

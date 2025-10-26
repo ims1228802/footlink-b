@@ -115,5 +115,35 @@ public class TeamServiceImpl implements TeamService{
 	public void editTeamState(State param) {
 		teamMapper.editTeamState(param);
 	}
+
+	@Override
+	public int getRecruitCount(String teamCode) {
+		return teamMapper.getRecruitCount(teamCode);
+	}
+
+	@Override
+	public void deleteRecruit(String teamCode) {
+		teamMapper.deleteRecruit(teamCode);
+	}
+
+	@Override
+	public void deleteCalendar(String teamDateCode) {
+		teamMapper.deleteCalendar(teamDateCode);
+	}
+
+	@Override
+	public Recruit getRecruitInfo(String teamCode) {
+		return teamMapper.getRecruitInfo(teamCode);
+	}
+
+	@Override
+	public void editTeamRecruit(Recruit recruit) {
+		teamMapper.editTeamRecruit(recruit);
+	}
+
+	@Override
+	public Calendar getCalendarDetail(String teamDateCode) {
+		return teamMapper.getCalendarDetail(teamDateCode);
+	}
 	
 }

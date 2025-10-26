@@ -22,4 +22,5 @@ public class Team {
 	private String stadium;						// 구장
 	private String gender;						// 성별
 	private String activeDoWeek;				// 활동 요일
+	private int recruitCount;					// 팀원 모집 카운트
 }

@@ -17,6 +17,9 @@ public interface TeamService {
 	List<MyInfo> getTeamUserList(String teamCode);		// 팀에 포함된 사용자 조회
 	State getTeamState(String teamCode);				// 팀 스텟 조회
 	List<Calendar> getTeamCalendar(String teamCode);	// 팀 일정 조회
+	int getRecruitCount(String teamCode);				// 팀 모집 카운트 조회
+	Recruit getRecruitInfo(String teamCode);			// 팀 모집 내용 조회
+	Calendar getCalendarDetail(String teamDateCode);	// 일정 상세 조회
 	void addTeamInfo(Team param);						// 팀 등록
 	void editTeamInfo(Team param);						// 팀 수정
 	void deleteTeam(String teamCode);					// 팀 삭제(소프트 삭제)
@@ -25,5 +28,8 @@ public interface TeamService {
 	void editTeamState(State param);					// 팀 능력치 수정
 	void addTeamUser(String teamCode, String userId);	// 팀 유저 등록
 	void addCalendar(Calendar calendar);				// 일정 등록
+	void deleteCalendar(String teamDateCode);			// 일정 삭제
 	void addTeamRecruit(Recruit recruit);				// 팀 모집글 등록
+	void editTeamRecruit(Recruit recruit);				// 팀 모집글 수정
+	void deleteRecruit(String teamCode);				// 팀 모집글 삭제
 }

@@ -22,6 +22,9 @@ public interface TeamMapper {
 	List<MyInfo> getTeamUserList(String teamCode);
 	State getTeamState(String teamCode);
 	List<Calendar> getTeamCalendar(String teamCode);
+	int getRecruitCount(String teamCode);
+	Recruit getRecruitInfo(String teamCode);
+	Calendar getCalendarDetail(String teamDateCode);
 	void addTeamInfo(Team param);
 	void editTeamInfo(Team param);
 	void deleteTeam(String teamCode);
@@ -30,5 +33,8 @@ public interface TeamMapper {
 	void editTeamState(State param);
 	void addTeamUser(Map<String, String> map);
 	void addCalendar(Calendar params);
+	void deleteCalendar(String teamDateCode);
 	void addTeamRecruit(Recruit recruit);
+	void editTeamRecruit(Recruit recruit);
+	void deleteRecruit(String teamCode);
 }
