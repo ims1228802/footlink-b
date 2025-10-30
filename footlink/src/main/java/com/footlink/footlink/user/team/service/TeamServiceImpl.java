@@ -196,12 +196,25 @@ public class TeamServiceImpl implements TeamService{
                     throw new RuntimeException("파일 업로드 실패");
                 }
 
-                // 2️ file_idx 생성 
                 String fileIdx = teamMapper.getFileIdx(teamCode);
-                fileDto.setFileIdx(fileIdx);
+                
+                // 2 팀 file_idx가 없을경우 file_idx 생성 
+                if(fileIdx != null) {
+                	fileDto.setFileIdx(fileIdx);                	
+                }else {
+                	String nextFileIdx = fileMapper.getNextFileIdx();
+                    if (nextFileIdx == null || nextFileIdx.isBlank()) {
+                        nextFileIdx = "file_001";
+                    }
+                    fileDto.setFileIdx(nextFileIdx);
+                }
 
                 // 3️ DB에 파일 등록
-                fileMapper.modifyfile(fileDto);
+                if(fileIdx != null) {
+                	fileMapper.modifyfile(fileDto);                	
+                }else {
+                	fileMapper.addfile(fileDto);
+                }
                 log.info("✅ 파일 수정 완료 - file_idx: {}", fileDto.getFileIdx());
                 
                 // 4 팀 프로필에 연결
