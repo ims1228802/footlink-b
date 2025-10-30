@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class Team {
 	private String teamCode;					// 팀 코드
+	private String teamImage;					// 팀 엠블렘 이미지
 	private String teamName;					// 팀 이름
 	private String regionName;					// 지역명
 	private String meetingTimeCode;				// 활동 시간 코드

@@ -9,6 +9,7 @@
 	<resultMap type="com.footlink.footlink.user.team.domain.Team" id="TeamList">
 		<id column="team_cd"			property="teamCode"/>
 		<result column="team_nm"		property="teamName"/>
+		<result column="team_img"     	property="teamImage"/>
 		<result column="rgn_nm"			property="regionName"/>
 		<result column="mtn_tm"			property="meetingTimeCode"/>
 		<result column="team_age"		property="teamAgeCode"/>
@@ -24,6 +25,7 @@
 	<select id="getTeamList" resultMap="TeamList">
 		SELECT
 			t.team_cd,
+			(SELECT file_path FROM files WHERE file_idx = t.team_img) as team_img,
 			t.team_nm,
 			t.rgn_nm,
 			m.mtn_tm_nm AS meetingTime,
@@ -98,6 +100,7 @@
 	<select id="getTeamDetail" resultMap="TeamList" parameterType="String">
 		SELECT
 			t.team_cd,
+			(SELECT file_path FROM files WHERE file_idx = t.team_img) as team_img,
 			t.team_nm,
 			t.rgn_nm,
 			m.mtn_tm_nm AS meetingTime,
@@ -207,6 +210,15 @@
 			ts.team_dt_cd = #{teamDateCode};
 	</select> 
 	
+	<select id="getFileIdx" parameterType="String">
+		SELECT
+			team_img
+		FROM
+			team
+		WHERE
+			team_cd = #{teamCode};
+	</select> 
+	
 	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
 		INSERT INTO team(
 			 team_cd, 
@@ -233,6 +245,16 @@
 			  #{activeDoWeek}
 			);
 	</insert>
+	
+	<update id="addEmblem" parameterType="Map">
+		UPDATE team
+		<set>
+			team_img = #{fileIdx}
+		</set>
+		<where>
+			team_cd = #{teamCode}; 
+		</where>
+	</update>
 	
 	<insert id="addTeamState" parameterType="com.footlink.footlink.user.team.domain.State">
 		INSERT INTO team_state(

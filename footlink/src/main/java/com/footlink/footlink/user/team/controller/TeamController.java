@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.team.domain.Calendar;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
@@ -106,6 +108,29 @@ public class TeamController {
 	public Calendar getCalendarDetail (@RequestParam String teamDateCode) {
 		Calendar calendarDetail = teamService.getCalendarDetail(teamDateCode);
 		return calendarDetail;
+	}
+	
+	// 팀 엠블렘 이미지 추가
+	@PostMapping("team/addTeamEmblem")
+	public ResponseEntity<String> addTeamEmblem(@RequestPart(value = "files", required = false) MultipartFile files,
+												@RequestPart(value = "teamCode", required = false) String teamCode){
+		log.info("가져온 파일: {}", files);
+		log.info("팀 코드: {}", teamCode);
+		teamService.addEmblem(files, teamCode);
+		
+		return ResponseEntity.ok("팀 엠블렘 추가 성공");
+	}
+	
+	// 팀 엠블렘 이미지 수정
+	@PutMapping("team/editTeamEmblem")
+	public ResponseEntity<String> editTeamEmblem(@RequestPart(value = "files", required = false) MultipartFile files,
+												@RequestPart(value = "teamCode", required = false) String teamCode){
+		log.info("가져온 파일: {}", files);
+		log.info("팀 코드: {}", teamCode);
+		
+		teamService.editEmblem(files, teamCode);
+		
+		return ResponseEntity.ok("엠블렘 수정 완료");
 	}
 	
 	// 팀 추가하기
