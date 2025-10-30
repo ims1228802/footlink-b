@@ -25,6 +25,8 @@ public interface TeamMapper {
 	int getRecruitCount(String teamCode);
 	Recruit getRecruitInfo(String teamCode);
 	Calendar getCalendarDetail(String teamDateCode);
+	String getFileIdx(String teamCode);
+	void addEmblem(Map<String, String> teamEmblem);
 	void addTeamInfo(Team param);
 	void editTeamInfo(Team param);
 	void deleteTeam(String teamCode);
