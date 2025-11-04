@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.footlink.footlink.search.mapper.SearchMapper">
+
+	<resultMap id="SuggestItemMap"
+		type="com.footlink.footlink.search.domain.SuggestItem">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+	</resultMap>
+
+	<!-- 구장 검색 -->
+	<select id="findStadiums" resultMap="SuggestItemMap">
+		SELECT stadium_no AS id, stadium_nm AS name
+		FROM stadium
+		WHERE stadium_nm LIKE CONCAT('%', #{q}, '%')
+		ORDER BY stadium_nm
+		LIMIT #{limit}
+	</select>
+
+	<!-- 팀 검색 -->
+	<select id="findTeams" resultMap="SuggestItemMap">
+		SELECT team_cd AS id, team_nm AS name
+		FROM team
+		WHERE team_nm LIKE CONCAT('%', #{q}, '%')
+		ORDER BY team_nm
+		LIMIT #{limit}
+	</select>
+
+</mapper>

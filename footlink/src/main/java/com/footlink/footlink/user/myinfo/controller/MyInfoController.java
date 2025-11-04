@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import com.footlink.footlink.user.myinfo.domain.MyAppliedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyCompletedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.myinfo.domain.MyLikeMatch;
+import com.footlink.footlink.user.myinfo.domain.PublicUserProfile;
 import com.footlink.footlink.user.myinfo.service.MyInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -77,11 +79,29 @@ public class MyInfoController {
     public ResponseEntity<List<MyAppliedMatch>> getAppliedMatches(Principal principal) {
         return ResponseEntity.ok(myInfoService.getAppliedMatches(principal.getName()));
     }
+    
+    @DeleteMapping("/applied-matches/{matchNo}")
+    public ResponseEntity<String> cancelAppliedMatch(
+            @PathVariable("matchNo") Long matchNo,
+            Principal principal) {
+        String email = principal.getName();
+        myInfoService.cancelAppliedMatch(email, matchNo);
+        return ResponseEntity.ok("신청이 취소되었습니다.");
+    }
+
 
     @GetMapping("/like-matches")
     public ResponseEntity<List<MyLikeMatch>> getLikeMatches(Principal principal) {
         return ResponseEntity.ok(myInfoService.getLikeMatches(principal.getName()));
     }
+    
+    @DeleteMapping("/like-matches/{matchNo}")
+    public ResponseEntity<Void> unlikeMatch(@PathVariable Long matchNo, Principal principal) {
+    	String email = principal.getName();
+        myInfoService.unlikeMatch(email, matchNo);
+        return ResponseEntity.noContent().build();
+    }
+    
 
     @GetMapping("/completed-matches")
     public ResponseEntity<List<MyCompletedMatch>> getCompletedMatches(Principal principal) {
@@ -125,6 +145,24 @@ public class MyInfoController {
         String email = principal.getName();
         myInfoService.withdrawUser(email);
         return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/myinfo/updateLevel")
+    public ResponseEntity<?> updateUserLevel(@RequestBody MyInfo myInfo, Principal principal) {
+        String email = principal.getName(); // ✅ 로그인한 사용자의 이메일
+        myInfo.setEmail(email);
+
+        log.info("🎯 [POST] /myinfo/updateLevel - 이메일: {}, 레벨: {}", email, myInfo.getLevel());
+        myInfoService.updateUserLevel(myInfo);
+
+        return ResponseEntity.ok("레벨 변경 완료");
+    }
+    
+    @GetMapping("/public/{userId}")
+    public ResponseEntity<PublicUserProfile> getPublicUser(@PathVariable String userId) {
+    	PublicUserProfile PublicUser = myInfoService.getPublicUser(userId);
+      if (PublicUser == null) return ResponseEntity.notFound().build(); // 404
+      return ResponseEntity.ok(PublicUser); // 200
     }
     
 }

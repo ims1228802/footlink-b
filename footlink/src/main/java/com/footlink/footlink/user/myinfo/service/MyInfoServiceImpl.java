@@ -16,6 +16,7 @@ import com.footlink.footlink.user.myinfo.domain.MyAppliedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyCompletedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.myinfo.domain.MyLikeMatch;
+import com.footlink.footlink.user.myinfo.domain.PublicUserProfile;
 import com.footlink.footlink.user.myinfo.mapper.MyInfoMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -131,5 +132,29 @@ public class MyInfoServiceImpl implements MyInfoService {
     public void withdrawUser(String email) {
         myInfoMapper.withdrawUser(email);
     }
+    
+    @Override
+    public void updateUserLevel(MyInfo myInfo) {
+        log.info("사용자 레벨 수정: {}", myInfo);
+        myInfoMapper.updateUserLevel(myInfo);
+    }
+
+	@Override
+	public void cancelAppliedMatch(String email, Long matchNo) {
+		myInfoMapper.deleteAppliedMatch(email, matchNo);
+	}
+
+	@Override
+	public void unlikeMatch(String email, Long matchNo) {
+		myInfoMapper.deleteLike(email, matchNo);
+		
+	}
+
+	@Override
+	public PublicUserProfile getPublicUser(String userId) {
+		return myInfoMapper.selectPublicUser(userId);
+	}
+	
+	
 
 }
