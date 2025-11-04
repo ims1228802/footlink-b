@@ -9,7 +9,7 @@ public class MyCompletedMatch {
     private String matchDate;
     private String matchTime;
     private String stadium;
-    private String matchTypeCd;
+    private String matchTypeNm;
     private Integer homeScore;
     private Integer awayScore;
     private String winner;

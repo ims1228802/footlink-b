@@ -9,6 +9,7 @@ import com.footlink.footlink.user.myinfo.domain.MyAppliedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyCompletedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.myinfo.domain.MyLikeMatch;
+import com.footlink.footlink.user.myinfo.domain.PublicUserProfile;
 
 public interface MyInfoService {
 	
@@ -34,5 +35,11 @@ public interface MyInfoService {
     
     void withdrawUser(String email);
 
-    
+	void updateUserLevel(MyInfo myInfo);
+
+	void cancelAppliedMatch(String email, Long matchNo);
+
+	void unlikeMatch(String email, Long matchNo);
+
+	PublicUserProfile getPublicUser(String userId);
 }
