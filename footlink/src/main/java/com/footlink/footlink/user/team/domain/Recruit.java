@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class Recruit {
+	private String recruitAplyCode;
 	private String teamCode;
 	private String teamDistinction;
 	private String stadium;

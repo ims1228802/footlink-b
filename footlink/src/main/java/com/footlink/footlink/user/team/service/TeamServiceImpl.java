@@ -2,6 +2,7 @@ package com.footlink.footlink.user.team.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
+import com.footlink.footlink.user.team.domain.UserRecruit;
 import com.footlink.footlink.user.team.mapper.TeamMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -76,6 +78,7 @@ public class TeamServiceImpl implements TeamService{
 		
 		map.put("teamCode", teamCode);
 		map.put("userId", userId);
+		map.put("teamAuhrt", "team_atrt_01");
 		
 		teamMapper.addTeamUser(map);
 	}
@@ -228,6 +231,47 @@ public class TeamServiceImpl implements TeamService{
 		} catch (Exception e) {
 			throw new RuntimeException("정보 수정 실패", e);
 		}
+	}
+
+	@Override
+	public void addUserRecruit(Map<String, String> recruit) {
+		teamMapper.addUserRecruit(recruit);
+	}
+
+	@Override
+	public List<UserRecruit> getUserRecruitInfo(String recruitAplyCode) {
+		return teamMapper.getUserRecruitInfo(recruitAplyCode);
+	}
+
+	@Override
+	public void modifyTeamDelegate(Map<String, String> teamUser) {
+		teamMapper.modifyTeamDelegate(teamUser);
+		teamMapper.teamMasterChange(teamUser);
+	}
+
+	@Override
+	public void addTeamUser(Map<String, String> acceptUser) {
+		HashMap<String, String> map = new HashMap<>();
+		
+		String teamCode = acceptUser.get("teamCode");
+		String userId = acceptUser.get("userId");
+		
+		map.put("teamCode", teamCode);
+		map.put("userId", userId);
+		map.put("teamAuhrt", "team_atrt_03");
+		
+		teamMapper.addTeamUser(map);
+		teamMapper.deleteRecruitApp(acceptUser);
+	}
+
+	@Override
+	public void recruitRejectUser(String userId, String recruitAplyCode) {
+		HashMap<String, String> rejectUser = new HashMap<>();
+		
+		rejectUser.put("recruitAplyCode", recruitAplyCode);
+		rejectUser.put("userId", userId);
+		
+		teamMapper.deleteRecruitApp(rejectUser);
 	}
 	
 }

@@ -182,6 +182,7 @@
 	
 	<select id="getRecruitInfo" resultType="com.footlink.footlink.user.team.domain.Recruit" parameterType="String">
 		SELECT
+			rcrt_aply_cd as recruitAplyCode,
 			team_cd AS teamCode, 
 			rcrt_aply_cn AS contents, 
 			(SELECT team_age_name FROM team_age WHERE team_age_cd = rcrt_team_age) AS age, 
@@ -218,6 +219,19 @@
 		WHERE
 			team_cd = #{teamCode};
 	</select> 
+	
+	<select id="getUserRecruitInfo" parameterType="String" resultType="com.footlink.footlink.user.team.domain.UserRecruit">
+		SELECT
+			rac.user_id AS id,
+			u.user_nm AS name,
+			rac.aply_cn AS contents
+		FROM
+			rcrt_aply_cn rac
+			LEFT JOIN user u
+			ON rac.user_id = u.user_id
+		WHERE
+			rac.rcrt_aply_cd = #{recruitAplyCode};
+	</select>
 	
 	<insert id="addTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
 		INSERT INTO team(
@@ -307,7 +321,7 @@
 		VALUES (
 				#{teamCode}, 
 				#{userId},
-				'team_atrt_01'
+				#{teamAuhrt}
 			);
 	</insert>
 	
@@ -381,6 +395,21 @@
 			);
 	</insert>
 	
+	<insert id="addUserRecruit" parameterType="Map">
+		INSERT INTO rcrt_aply_cn(
+			rcrt_aply_cd, 
+			user_id, 
+			aply_cn, 
+			aply_dt
+			)
+		VALUES (
+			#{recruitAplyCode}, 
+			#{userId}, 
+			#{contents}, 
+			NOW()
+			);
+	</insert>
+	
 	<update id="editTeamInfo" parameterType="com.footlink.footlink.user.team.domain.Team">
 		UPDATE team
 		<set>
@@ -422,6 +451,28 @@
 		</where>
 	</update>
 	
+	<update id="modifyTeamDelegate" parameterType="Map">
+		UPDATE team_user
+		<set>
+			team_auhrt_cd = 'team_atrt_01'
+		</set>
+		<where>
+			team_cd = #{teamCode}
+			AND user_cd = #{selectedId}
+		</where>
+	</update>
+	
+	<update id="teamMasterChange" parameterType="Map">
+		UPDATE team_user
+		<set>
+			team_auhrt_cd = 'team_atrt_03'
+		</set>
+		<where>
+			team_cd = #{teamCode}
+			AND user_cd = #{userId}
+		</where>
+	</update>
+	
 	<delete id="deleteTeamUser" parameterType="Map">
 		DELETE FROM team_user
 		WHERE
@@ -440,5 +491,12 @@
 		DELETE FROM team_recruit_post
 		WHERE
 			team_cd = #{teamCode};
+	</delete>
+	
+	<delete id="deleteRecruitApp" parameterType="Map">
+		DELETE FROM rcrt_aply_cn
+		WHERE
+			rcrt_aply_cd = #{recruitAplyCode}
+			AND user_id = #{userId}
 	</delete>
 </mapper>
