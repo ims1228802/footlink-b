@@ -1,6 +1,7 @@
 package com.footlink.footlink.user.team.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +11,7 @@ import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
+import com.footlink.footlink.user.team.domain.UserRecruit;
 
 public interface TeamService {
 	List<Team> getTeamList();									// 팀 리스트 조회
@@ -22,6 +24,7 @@ public interface TeamService {
 	int getRecruitCount(String teamCode);						// 팀 모집 카운트 조회
 	Recruit getRecruitInfo(String teamCode);					// 팀 모집 내용 조회
 	Calendar getCalendarDetail(String teamDateCode);			// 일정 상세 조회
+	List<UserRecruit>getUserRecruitInfo(String recruitAplyCode);// 모집 신청 내역 조회
 	void addEmblem(MultipartFile files, String teamCode);		// 팀 엠블렘 사진 추가
 	void editEmblem(MultipartFile files, String teamCode);		// 팀 엠블렘 사진 수정
 	void addTeamInfo(Team param);								// 팀 등록
@@ -31,9 +34,13 @@ public interface TeamService {
 	void addTeamState(State param);								// 팀 능력치 등록
 	void editTeamState(State param);							// 팀 능력치 수정
 	void addTeamUser(String teamCode, String userId);			// 팀 유저 등록
+	void addTeamUser(Map<String, String> acceptUser);			// 팀 유저 등록(가입신청 수락)
 	void addCalendar(Calendar calendar);						// 일정 등록
 	void deleteCalendar(String teamDateCode);					// 일정 삭제
 	void addTeamRecruit(Recruit recruit);						// 팀 모집글 등록
 	void editTeamRecruit(Recruit recruit);						// 팀 모집글 수정
 	void deleteRecruit(String teamCode);						// 팀 모집글 삭제
+	void addUserRecruit(Map<String, String> recruit);			// 유저 모집 신청 내역 등록
+	void modifyTeamDelegate(Map<String, String> teamUser);		// 팀장 위임
+	void recruitRejectUser(String userId, String recruitAplyCode);	// 가입 신청 거절
 }

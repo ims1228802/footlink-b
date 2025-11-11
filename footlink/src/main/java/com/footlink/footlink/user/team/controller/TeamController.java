@@ -23,6 +23,7 @@ import com.footlink.footlink.user.team.domain.Calendar;
 import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.Team;
+import com.footlink.footlink.user.team.domain.UserRecruit;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.service.TeamService;
 
@@ -560,4 +561,54 @@ public class TeamController {
 		teamService.deleteRecruit(teamCode);
 		return ResponseEntity.ok("팀원 모집 삭제 성공");
 	}
+	
+	// 신청 내역 추가
+	@PostMapping("team/appRecruit")
+	public ResponseEntity<String> addRecruitApplication(@RequestBody Map<String, String> recruit){
+		log.info("가져온 신청내역: {}",recruit);
+		
+		teamService.addUserRecruit(recruit);
+		
+		return ResponseEntity.ok("신청하기가 완료되었습니다");
+	}
+	
+	// 모집 신청 내역 조회
+	@GetMapping("team/userRecruit")
+	public List<UserRecruit> getRecruitUserList(@RequestParam(required = false) String recruitAplyCode){
+		log.info("모집 신청 코드: {}", recruitAplyCode);
+		
+		List<UserRecruit> userList = teamService.getUserRecruitInfo(recruitAplyCode);
+		
+		return userList;
+	}
+	
+	// 팀장 위임
+	@PutMapping("team/delegate")
+	public ResponseEntity<String> modifyTeamDelegate(@RequestBody Map<String, String> teamUser){
+		log.info("선택된 사용자: {}", teamUser);
+		
+		teamService.modifyTeamDelegate(teamUser);
+		
+		return ResponseEntity.ok("팀장 위임 완료");
+	}
+	
+	// 팀원 가입 수락
+	@PostMapping("team/acceptUser")
+	public ResponseEntity<String> addTeamUser(@RequestBody Map<String, String> acceptUser){
+		log.info("수락된 사용자: {}", acceptUser);
+		teamService.addTeamUser(acceptUser);
+		
+		return ResponseEntity.ok("가입 수락 완료");
+	}
+	
+	// 팀원 가입 거절
+	@DeleteMapping("team/rejectUser")
+	public ResponseEntity<String> deleteRecruitApp(@RequestParam String userId,
+												   @RequestParam String recruitAplyCode){
+		
+		teamService.recruitRejectUser(userId, recruitAplyCode);
+		
+		return ResponseEntity.ok("가입 거절 완료");
+	}
+	
 }

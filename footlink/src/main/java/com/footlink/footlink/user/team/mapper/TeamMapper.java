@@ -11,6 +11,7 @@ import com.footlink.footlink.user.team.domain.Recruit;
 import com.footlink.footlink.user.team.domain.StadiumArea;
 import com.footlink.footlink.user.team.domain.State;
 import com.footlink.footlink.user.team.domain.Team;
+import com.footlink.footlink.user.team.domain.UserRecruit;
 
 @Mapper
 public interface TeamMapper {
@@ -26,6 +27,7 @@ public interface TeamMapper {
 	Recruit getRecruitInfo(String teamCode);
 	Calendar getCalendarDetail(String teamDateCode);
 	String getFileIdx(String teamCode);
+	List<UserRecruit> getUserRecruitInfo(String recruitAplyCode);
 	void addEmblem(Map<String, String> teamEmblem);
 	void addTeamInfo(Team param);
 	void editTeamInfo(Team param);
@@ -39,4 +41,8 @@ public interface TeamMapper {
 	void addTeamRecruit(Recruit recruit);
 	void editTeamRecruit(Recruit recruit);
 	void deleteRecruit(String teamCode);
+	void addUserRecruit(Map<String, String> recruit);
+	void modifyTeamDelegate(Map<String, String> teamUser);
+	void teamMasterChange(Map<String, String> teamUser);
+	void deleteRecruitApp(Map<String, String> acceptUser);
 }
