@@ -10,6 +10,7 @@ import com.footlink.footlink.user.myinfo.domain.MyAppliedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyCompletedMatch;
 import com.footlink.footlink.user.myinfo.domain.MyInfo;
 import com.footlink.footlink.user.myinfo.domain.MyLikeMatch;
+import com.footlink.footlink.user.myinfo.domain.PublicUserProfile;
 
 @Mapper
 public interface MyInfoMapper {
@@ -36,5 +37,13 @@ public interface MyInfoMapper {
     int updatePassword(@Param("email") String email, @Param("password") String password);
     
     int withdrawUser(@Param("email") String email);
+    
+    int updateUserLevel(MyInfo myInfo);
+
+    void deleteAppliedMatch(@Param("email") String email, @Param("matchNo") Long matchNo);
+
+	void deleteLike(@Param("email") String email, @Param("matchNo") Long matchNo);
+	
+	PublicUserProfile selectPublicUser(@Param("userId") String userId);
 
 }
